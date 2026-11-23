@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=SchoolFox
+Comment=SchoolFox notifications
+Icon=harbour-schoolfox
+Exec=harbour-schoolfox
+X-Nemo-Application-Type=silica-qt5
+X-Nemo-Single-Instance=yes
+
+[X-Sailjail]
+Permissions=Internet;Notifications
+OrganizationName=org.roterfux
+ApplicationName=harbour-schoolfox
