@@ -732,12 +732,15 @@ QVariantMap SchoolFoxClient::parseMessage(const QVariantMap &row, const QVariant
     m.insert(QStringLiteral("title"), title);
     m.insert(QStringLiteral("body"), body);
     m.insert(QStringLiteral("html"), html);
+    // Real list field is "senderName" (seen on device); others are fallbacks.
     m.insert(QStringLiteral("sender"), firstString(row, QStringList()
+                                                   << QStringLiteral("senderName")
                                                    << QStringLiteral("creatorFullName")
                                                    << QStringLiteral("CreatorFullName")
-                                                   << QStringLiteral("creatorName")
-                                                   << QStringLiteral("teacherFullName")));
-    m.insert(QStringLiteral("pupil"), pupil.value(QStringLiteral("name")));
+                                                   << QStringLiteral("creatorName")));
+    m.insert(QStringLiteral("pupil"), pupil.contains(QStringLiteral("name"))
+                                          ? pupil.value(QStringLiteral("name"))
+                                          : row.value(QStringLiteral("pupilNameForParent")));
     m.insert(QStringLiteral("pupilId"), row.contains(QStringLiteral("pupilId"))
                                             ? row.value(QStringLiteral("pupilId"))
                                             : pupil.value(QStringLiteral("pupilId")));
@@ -749,22 +752,11 @@ QVariantMap SchoolFoxClient::parseMessage(const QVariantMap &row, const QVariant
     m.insert(QStringLiteral("dueDate"), parseDate(row.value(QStringLiteral("dueDate")).toString()));
     m.insert(QStringLiteral("date"), date);
     m.insert(QStringLiteral("serverRead"), row.value(QStringLiteral("isRead")).toBool());
-    // Attachment hint for the list; field name not confirmed, so try several.
-    int files = -1;
-    for (const QString &k : QStringList() << QStringLiteral("filesCount") << QStringLiteral("fileCount")
-                                         << QStringLiteral("attachmentsCount") << QStringLiteral("numberOfFiles")) {
-        if (row.contains(k)) { files = row.value(k).toInt(); break; }
-    }
-    if (files < 0) {
-        for (const QString &k : QStringList() << QStringLiteral("files") << QStringLiteral("attachments")) {
-            if (row.value(k).type() == QVariant::List) { files = row.value(k).toList().size(); break; }
-        }
-    }
-    if (files < 0) {
-        for (const QString &k : QStringList() << QStringLiteral("hasFiles") << QStringLiteral("hasAttachments")) {
-            if (row.contains(k)) { files = row.value(k).toBool() ? 1 : 0; break; }
-        }
-    }
+    // The list reply has no attachment field (checked on device), so the
+    // paperclip is unknown (-1) here; the message page loads the real list.
+    // NOTE: never range-for over "QStringList() << ..." - the temporary is
+    // destroyed before the loop runs (this crashed 0.4.2 / 0.5.0).
+    const int files = -1;
     m.insert(QStringLiteral("attachments"), files);
     return m;
 }

@@ -59,7 +59,7 @@ function message(row, pupil) {
         title: first(row, ["topic", "Topic", "title"]) || body.split("\n")[0].substring(0, 80),
         body: body,
         html: html,
-        sender: first(row, ["creatorFullName", "CreatorFullName", "creatorName", "teacherFullName"]),
+        sender: first(row, ["senderName", "creatorFullName", "CreatorFullName", "creatorName"]),
         pupil: pupil ? pupil.name : "",
         pupilId: row.pupilId || (pupil ? pupil.pupilId : ""),
         classId: pupil ? pupil.classId : row.schoolClassId,
