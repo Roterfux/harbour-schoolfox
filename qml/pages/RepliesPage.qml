@@ -103,6 +103,7 @@ Page {
                     width: parent.width
                     text: model.text
                     wrapMode: Text.Wrap
+                    horizontalAlignment: Text.AlignJustify
                     color: Theme.highlightColor
                 }
             }

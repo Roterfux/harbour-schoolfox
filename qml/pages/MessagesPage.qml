@@ -180,6 +180,7 @@ Page {
                         text: (msg.body || "").trim().replace(/\s+/g, " ")
                         maximumLineCount: 2
                         wrapMode: Text.Wrap
+                        horizontalAlignment: Text.AlignJustify
                         elide: Text.ElideRight
                         font.pixelSize: Theme.fontSizeSmall
                         color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor

@@ -246,6 +246,7 @@ Page {
                 color: Theme.primaryColor
                 linkColor: Theme.highlightColor
                 lineHeight: 1.15
+                horizontalAlignment: Text.AlignJustify
                 onLinkActivated: Qt.openUrlExternally(link)
             }
 

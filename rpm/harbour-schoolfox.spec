@@ -1,5 +1,5 @@
 Name:       harbour-schoolfox
-Version:    0.5.1
+Version:    0.5.2
 Release:    1
 Summary:    SchoolFox notifications for Sailfish OS
 License:    BSD
