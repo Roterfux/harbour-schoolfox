@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.roterfux.harbour-schoolfox
+Exec=/usr/bin/sailjail -p harbour-schoolfox.desktop /usr/bin/harbour-schoolfox
