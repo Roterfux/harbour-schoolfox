@@ -25,7 +25,7 @@ jobs:
       - name: Build in Sailfish OS Platform SDK
         run: |
           mkdir -p out && chmod 777 out
-          docker run --rm \
+          docker run --rm --privileged \
             -v "$PWD":/src:ro -v "$PWD/out":/out \
             coderus/sailfishos-platform-sdk:${SFOS_RELEASE} \
             bash -lc '
