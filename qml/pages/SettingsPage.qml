@@ -37,6 +37,23 @@ Page {
                 wrapMode: Text.Wrap
             }
 
+            SectionHeader { text: qsTr("Notifications") }
+
+            TextSwitch {
+                text: qsTr("Sailfish notifications")
+                description: qsTr("Show new SchoolFox messages in the Events view")
+                checked: SchoolFox.notificationsEnabled
+                onClicked: SchoolFox.notificationsEnabled = checked
+            }
+
+            TextSwitch {
+                text: qsTr("Show message text")
+                description: qsTr("Off: only the title appears in the notification")
+                enabled: SchoolFox.notificationsEnabled
+                checked: SchoolFox.notificationContent
+                onClicked: SchoolFox.notificationContent = checked
+            }
+
             SectionHeader { text: qsTr("Account") }
 
             DetailItem {

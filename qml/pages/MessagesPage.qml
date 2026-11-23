@@ -42,10 +42,11 @@ Page {
 
         delegate: ListItem {
             id: item
-            contentHeight: Theme.itemSizeLarge
+            contentHeight: col.height + 2 * Theme.paddingMedium
             property var msg: modelData
 
             Column {
+                id: col
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 anchors.verticalCenter: parent.verticalCenter
@@ -63,6 +64,16 @@ Page {
                           .filter(function(x) { return x }).join(" · ")
                     truncationMode: TruncationMode.Fade
                     font.pixelSize: Theme.fontSizeExtraSmall
+                    color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                }
+                Label {
+                    width: parent.width
+                    visible: text !== ""
+                    text: (msg.body || "").trim().replace(/\s+/g, " ")
+                    maximumLineCount: 2
+                    wrapMode: Text.Wrap
+                    elide: Text.ElideRight
+                    font.pixelSize: Theme.fontSizeSmall
                     color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
                 }
             }

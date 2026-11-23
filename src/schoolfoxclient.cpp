@@ -67,6 +67,8 @@ SchoolFoxClient::SchoolFoxClient(QObject *parent)
     m_token = m_settings.value(QStringLiteral("auth/token")).toString();
     m_username = m_settings.value(QStringLiteral("auth/username")).toString();
     m_pollMinutes = m_settings.value(QStringLiteral("poll/minutes"), 15).toInt();
+    m_notificationsEnabled = m_settings.value(QStringLiteral("notify/enabled"), true).toBool();
+    m_notificationContent = m_settings.value(QStringLiteral("notify/content"), true).toBool();
     m_seenIds = toSet(m_settings.value(QStringLiteral("state/seen")).toStringList());
     m_readIds = toSet(m_settings.value(QStringLiteral("state/read")).toStringList());
 }
@@ -87,6 +89,24 @@ void SchoolFoxClient::setPollMinutes(int minutes)
     m_pollMinutes = minutes;
     m_settings.setValue(QStringLiteral("poll/minutes"), minutes);
     emit pollMinutesChanged();
+}
+
+void SchoolFoxClient::setNotificationsEnabled(bool on)
+{
+    if (on == m_notificationsEnabled)
+        return;
+    m_notificationsEnabled = on;
+    m_settings.setValue(QStringLiteral("notify/enabled"), on);
+    emit notificationsEnabledChanged();
+}
+
+void SchoolFoxClient::setNotificationContent(bool on)
+{
+    if (on == m_notificationContent)
+        return;
+    m_notificationContent = on;
+    m_settings.setValue(QStringLiteral("notify/content"), on);
+    emit notificationContentChanged();
 }
 
 // ---------------------------------------------------------------------------
@@ -322,8 +342,7 @@ void SchoolFoxClient::fetchPupilMessages(int index)
             return a.toMap().value(QStringLiteral("date")).toDateTime()
                  > b.toMap().value(QStringLiteral("date")).toDateTime();
         });
-        handleMessages(m_collected);
-        finishRefresh(true);
+        fillContent(0, 15);
         return;
     }
     const QVariantMap p = m_pupils.at(index).toMap();
@@ -359,6 +378,8 @@ void SchoolFoxClient::fetchPupilMessages(int index)
         const QJsonDocument doc = QJsonDocument::fromJson(data);
         const QJsonArray arr = doc.isArray() ? doc.array()
                                              : doc.object().value(QStringLiteral("results")).toArray();
+        if (!arr.isEmpty())
+            qDebug() << "schoolfox: message fields" << arr.first().toObject().keys();
         for (const QJsonValue &v : arr) {
             const QVariantMap m = parseMessage(v.toObject().toVariantMap(), pupilName);
             if (!m.isEmpty())
@@ -401,6 +422,103 @@ QVariantMap SchoolFoxClient::parseMessage(const QVariantMap &row, const QString 
     m.insert(QStringLiteral("date"), date);
     m.insert(QStringLiteral("serverRead"), row.value(QStringLiteral("isRead")).toBool());
     return m;
+}
+
+// Messages without text in the list: fetch tables/Messages/{id}, newest first,
+// at most `budget` calls per refresh. Results are cached for the session.
+void SchoolFoxClient::fillContent(int index, int budget)
+{
+    while (index < m_collected.size()) {
+        QVariantMap m = m_collected.at(index).toMap();
+        applyContent(m);
+        m_collected[index] = m;
+        if (m.value(QStringLiteral("body")).toString().isEmpty() && budget > 0)
+            break;
+        ++index;
+    }
+    if (index >= m_collected.size()) {
+        handleMessages(m_collected);
+        finishRefresh(true);
+        return;
+    }
+    const QString id = m_collected.at(index).toMap().value(QStringLiteral("id")).toString();
+    if (!validId(id)) {
+        fillContent(index + 1, budget);
+        return;
+    }
+    apiGet(QStringLiteral("tables/Messages/") + id,
+           [this, index, budget, id](int status, const QByteArray &data,
+                                     QNetworkReply::NetworkError err, const QString &) {
+        if (status == 200 && err == QNetworkReply::NoError) {
+            const QJsonObject o = QJsonDocument::fromJson(data).object();
+            static bool logged = false;
+            if (!logged) { logged = true; qDebug() << "schoolfox: detail fields" << o.keys(); }
+            storeContent(id, parseMessage(o.toVariantMap(), QString()));
+        } else {
+            qWarning() << "schoolfox: detail failed" << status;
+            QVariantMap empty;
+            empty.insert(QStringLiteral("failed"), true);
+            m_content.insert(id, empty);   // don't retry this session
+        }
+        QVariantMap m = m_collected.at(index).toMap();
+        applyContent(m);
+        m_collected[index] = m;
+        fillContent(index + 1, budget - 1);
+    });
+}
+
+void SchoolFoxClient::storeContent(const QString &id, const QVariantMap &detail)
+{
+    QVariantMap c;
+    c.insert(QStringLiteral("title"), detail.value(QStringLiteral("title")));
+    c.insert(QStringLiteral("body"), detail.value(QStringLiteral("body")));
+    c.insert(QStringLiteral("html"), detail.value(QStringLiteral("html")));
+    if (!detail.value(QStringLiteral("sender")).toString().isEmpty())
+        c.insert(QStringLiteral("sender"), detail.value(QStringLiteral("sender")));
+    m_content.insert(id, c);
+}
+
+void SchoolFoxClient::applyContent(QVariantMap &m) const
+{
+    const QString id = m.value(QStringLiteral("id")).toString();
+    if (!m.value(QStringLiteral("body")).toString().isEmpty() || !m_content.contains(id))
+        return;
+    const QVariantMap c = m_content.value(id);
+    if (c.value(QStringLiteral("failed")).toBool()) {
+        m.insert(QStringLiteral("body"), QStringLiteral(" "));   // stop retrying
+        return;
+    }
+    for (const QString &k : QStringList() << QStringLiteral("body") << QStringLiteral("html")
+                                          << QStringLiteral("sender") << QStringLiteral("title")) {
+        if (m.value(k).toString().isEmpty() || k == QLatin1String("body") || k == QLatin1String("html"))
+            if (!c.value(k).toString().isEmpty())
+                m.insert(k, c.value(k));
+    }
+}
+
+void SchoolFoxClient::loadContent(const QString &id)
+{
+    if (!validId(id) || m_token == QLatin1String(DemoToken))
+        return;
+    apiGet(QStringLiteral("tables/Messages/") + id,
+           [this, id](int status, const QByteArray &data, QNetworkReply::NetworkError err,
+                      const QString &errString) {
+        if (status != 200 || err != QNetworkReply::NoError) {
+            qWarning() << "schoolfox: detail failed" << status << errString;
+            return;
+        }
+        storeContent(id, parseMessage(QJsonDocument::fromJson(data).object().toVariantMap(), QString()));
+        for (QVariant &v : m_messages) {
+            QVariantMap m = v.toMap();
+            if (m.value(QStringLiteral("id")).toString() != id)
+                continue;
+            m.remove(QStringLiteral("body"));
+            applyContent(m);
+            v = m;
+            emit messageUpdated(m);
+        }
+        emit messagesChanged();
+    });
 }
 
 void SchoolFoxClient::finishRefresh(bool ok)
@@ -475,7 +593,7 @@ void SchoolFoxClient::handleMessages(const QVariantList &fresh)
     m_settings.setValue(QStringLiteral("state/synced"), true);
     emit messagesChanged();
     // Don't spam notifications for the whole backlog on first login.
-    if (!firstSync && !newOnes.isEmpty())
+    if (!firstSync && !newOnes.isEmpty() && m_notificationsEnabled)
         emit newMessages(newOnes);
 }
 

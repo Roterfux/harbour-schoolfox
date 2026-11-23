@@ -2,6 +2,7 @@
 #define SCHOOLFOXCLIENT_H
 
 #include <QObject>
+#include <QHash>
 #include <QSet>
 #include <QSettings>
 #include <QVariantList>
@@ -33,6 +34,8 @@ class SchoolFoxClient : public QObject
     Q_PROPERTY(QVariantList messages READ messages NOTIFY messagesChanged)
     Q_PROPERTY(int unreadCount READ unreadCount NOTIFY messagesChanged)
     Q_PROPERTY(int pollMinutes READ pollMinutes WRITE setPollMinutes NOTIFY pollMinutesChanged)
+    Q_PROPERTY(bool notificationsEnabled READ notificationsEnabled WRITE setNotificationsEnabled NOTIFY notificationsEnabledChanged)
+    Q_PROPERTY(bool notificationContent READ notificationContent WRITE setNotificationContent NOTIFY notificationContentChanged)
 
 public:
     explicit SchoolFoxClient(QObject *parent = nullptr);
@@ -46,12 +49,18 @@ public:
     int unreadCount() const;
     int pollMinutes() const { return m_pollMinutes; }
     void setPollMinutes(int minutes);
+    bool notificationsEnabled() const { return m_notificationsEnabled; }
+    void setNotificationsEnabled(bool on);
+    bool notificationContent() const { return m_notificationContent; }
+    void setNotificationContent(bool on);
 
     Q_INVOKABLE void login(const QString &username, const QString &password);
     Q_INVOKABLE void submitTwoFactorCode(const QString &code);
     Q_INVOKABLE void logout();
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void markRead(const QString &id);
+    // Loads full content of one message (tables/Messages/{id}); emits messageUpdated.
+    Q_INVOKABLE void loadContent(const QString &id);
 
 signals:
     void loggedInChanged();
@@ -60,6 +69,9 @@ signals:
     void errorChanged();
     void messagesChanged();
     void pollMinutesChanged();
+    void notificationsEnabledChanged();
+    void notificationContentChanged();
+    void messageUpdated(const QVariantMap &message);
     // Messages not seen before. Each item: {id, title, body, html, sender, pupil, date, read}
     void newMessages(const QVariantList &messages);
     // Emitted after every refresh attempt, success or not (for BackgroundJob.finished()).
@@ -79,6 +91,9 @@ private:
     void fetchInventory();
     void fetchPupilMessages(int index);
     void finishRefresh(bool ok);
+    void fillContent(int index, int budget);
+    void applyContent(QVariantMap &m) const;
+    void storeContent(const QString &id, const QVariantMap &detail);
     QVariantMap parseMessage(const QVariantMap &row, const QString &pupilName) const;
 
     void demoFetchMessages();
@@ -97,6 +112,9 @@ private:
     QString m_error;
     bool m_busy = false;
     int m_pollMinutes = 15;
+    bool m_notificationsEnabled = true;
+    bool m_notificationContent = true;
+    QHash<QString, QVariantMap> m_content;   // id -> {title, body, html} from detail calls
     QVariantList m_messages;
     QSet<QString> m_seenIds;
     QSet<QString> m_readIds;

@@ -43,7 +43,7 @@ ApplicationWindow {
         onNewMessages: {
             for (var i = 0; i < messages.length; ++i) {
                 var m = messages[i]
-                var text = (m.body || "").replace(/\s+/g, " ")
+                var text = SchoolFox.notificationContent ? (m.body || "").trim().replace(/\s+/g, " ") : ""
                 if (text.length > 300) text = text.substring(0, 300) + "…"
                 var who = [m.sender, m.pupil].filter(function(x) { return x }).join(" · ")
                 var n = notificationComponent.createObject(app, {
