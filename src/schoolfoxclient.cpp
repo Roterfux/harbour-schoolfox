@@ -103,7 +103,10 @@ QNetworkReply *SchoolFoxClient::send(const QByteArray &method, const QString &pa
         req.setRawHeader("X-ZUMO-AUTH", token.toUtf8());
     if (!body.isEmpty())
         req.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/json"));
-    return m_nam->sendCustomRequest(req, method, body);
+    // Qt 5.6: no sendCustomRequest(QByteArray) overload.
+    if (method == "POST")
+        return m_nam->post(req, body);
+    return m_nam->get(req);
 }
 
 void SchoolFoxClient::call(const QByteArray &method, const QString &path, const QByteArray &body,
