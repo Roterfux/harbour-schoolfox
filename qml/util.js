@@ -136,3 +136,28 @@ function fileIcon(name) {
     if (/\.pdf$/i.test(name || "")) return "image://theme/icon-m-file-pdf"
     return "image://theme/icon-m-attach"
 }
+
+// "Today", "Yesterday", weekday (this week) or full date – for list sections.
+function dayKey(d) {
+    if (!d) return ""
+    return d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate()
+}
+
+function daysAgo(d) {
+    var a = new Date(); a.setHours(0, 0, 0, 0)
+    var b = new Date(d.getTime()); b.setHours(0, 0, 0, 0)
+    return Math.round((a - b) / 86400000)
+}
+
+// Stable color per child (index into a small palette).
+function childColor(name) {
+    var palette = ["#e57373", "#64b5f6", "#81c784", "#ffb74d", "#ba68c8", "#4db6ac"]
+    var h = 0
+    for (var i = 0; i < (name || "").length; ++i) h = (h * 31 + name.charCodeAt(i)) % 997
+    return palette[h % palette.length]
+}
+
+function initials(name) {
+    var parts = String(name || "?").trim().split(/\s+/)
+    return (parts[0].charAt(0) + (parts.length > 1 ? parts[parts.length - 1].charAt(0) : "")).toUpperCase()
+}

@@ -2,42 +2,52 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 
 CoverBackground {
-    readonly property var newest: SchoolFox.messages.length > 0 ? SchoolFox.messages[0] : null
+    id: cover
+    readonly property var unread: SchoolFox.messages.filter(function(m) { return !m.read })
+    readonly property var latest: (unread.length > 0 ? unread : SchoolFox.messages).slice(0, 3)
+
+    Image {   // faint icon watermark
+        anchors { right: parent.right; bottom: parent.bottom; margins: -Theme.paddingLarge }
+        source: "/usr/share/icons/hicolor/172x172/apps/harbour-schoolfox.png"
+        width: parent.width * 0.6
+        height: width
+        opacity: 0.12
+    }
 
     Column {
-        anchors.centerIn: parent
+        x: Theme.paddingLarge
+        y: Theme.paddingLarge
         width: parent.width - 2 * Theme.paddingLarge
         spacing: Theme.paddingSmall
 
-        Image {
-            anchors.horizontalCenter: parent.horizontalCenter
-            source: "/usr/share/icons/hicolor/86x86/apps/harbour-schoolfox.png"
-            width: Theme.iconSizeMedium
-            height: width
-            opacity: 0.6
+        Row {
+            spacing: Theme.paddingMedium
+            Label {
+                id: countLabel
+                text: SchoolFox.loggedIn ? SchoolFox.unreadCount : "–"
+                font.pixelSize: Theme.fontSizeHuge
+                color: SchoolFox.unreadCount > 0 ? Theme.highlightColor : Theme.primaryColor
+            }
+            Label {
+                anchors.baseline: countLabel.baseline
+                text: SchoolFox.loggedIn ? qsTr("unread") : qsTr("not logged in")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryColor
+                width: cover.width - countLabel.width - 3 * Theme.paddingLarge
+                wrapMode: Text.Wrap
+            }
         }
 
-        Label {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: SchoolFox.loggedIn ? SchoolFox.unreadCount : "–"
-            font.pixelSize: Theme.fontSizeHuge
-            color: Theme.primaryColor
-        }
-        Label {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: SchoolFox.loggedIn ? qsTr("unread") : qsTr("not logged in")
-            color: Theme.secondaryColor
-        }
-        Label {
-            width: parent.width
-            visible: newest !== null
-            text: newest ? newest.title : ""
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
-            maximumLineCount: 3
-            elide: Text.ElideRight
-            font.pixelSize: Theme.fontSizeExtraSmall
-            color: Theme.highlightColor
+        Repeater {
+            model: cover.latest
+            Label {
+                width: parent.width
+                text: modelData.title
+                truncationMode: TruncationMode.Fade
+                font.pixelSize: Theme.fontSizeExtraSmall
+                font.bold: !modelData.read
+                color: modelData.read ? Theme.secondaryColor : Theme.primaryColor
+            }
         }
     }
 

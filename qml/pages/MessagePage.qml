@@ -141,32 +141,101 @@ Page {
             spacing: Theme.paddingMedium
 
             PageHeader {
-                title: page.message.title
-                description: Util.join([page.message.sender, page.message.pupil])
+                title: page.message.pupil || qsTr("Message")
             }
 
+            // title
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                text: page.message.date ? Format.formatDate(page.message.date, Formatter.DateFull) + " "
-                                          + Format.formatDate(page.message.date, Formatter.TimeValue) : ""
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.secondaryHighlightColor
-            }
-
-            Label {
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                visible: page.message.eventDate || page.message.dueDate ? true : false
-                text: page.message.eventDate
-                      ? qsTr("Event: %1").arg(Format.formatDate(page.message.eventDate, Formatter.DateFull)
-                                              + " " + Format.formatDate(page.message.eventDate, Formatter.TimeValue))
-                      : page.message.dueDate
-                        ? qsTr("Due: %1").arg(Format.formatDate(page.message.dueDate, Formatter.DateFull)) : ""
+                text: page.message.title
                 wrapMode: Text.Wrap
+                font.pixelSize: Theme.fontSizeLarge
+                font.family: Theme.fontFamilyHeading
                 color: Theme.highlightColor
             }
 
+            // sender + date
+            Row {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                spacing: Theme.paddingMedium
+                Rectangle {
+                    id: avatar
+                    width: Theme.iconSizeMedium
+                    height: width
+                    radius: width / 2
+                    color: Util.childColor(page.message.sender || "?")
+                    Label {
+                        anchors.centerIn: parent
+                        text: Util.initials(page.message.sender || "?")
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        font.bold: true
+                        color: "white"
+                    }
+                }
+                Column {
+                    width: parent.width - avatar.width - parent.spacing
+                    anchors.verticalCenter: avatar.verticalCenter
+                    Label {
+                        width: parent.width
+                        text: page.message.sender || qsTr("SchoolFox")
+                        truncationMode: TruncationMode.Fade
+                        color: Theme.primaryColor
+                    }
+                    Label {
+                        width: parent.width
+                        text: page.message.date ? Format.formatDate(page.message.date, Formatter.DateFull) + " · "
+                                                  + Format.formatDate(page.message.date, Formatter.TimeValue) : ""
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        color: Theme.secondaryColor
+                    }
+                }
+            }
+
+            // event / due date chip
+            BackgroundItem {
+                width: parent.width
+                height: eventRow.height + 2 * Theme.paddingSmall
+                visible: page.message.eventDate || page.message.dueDate ? true : false
+                enabled: page.icsText !== ""
+                onClicked: page.addToCalendar()
+                Row {
+                    id: eventRow
+                    x: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: Theme.paddingMedium
+                    Image {
+                        anchors.verticalCenter: parent.verticalCenter
+                        source: "image://theme/icon-m-date?" + Theme.highlightColor
+                    }
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        Label {
+                            text: page.message.eventDate
+                                  ? qsTr("Event: %1").arg(Format.formatDate(page.message.eventDate, Formatter.DateFull)
+                                                          + " " + Format.formatDate(page.message.eventDate, Formatter.TimeValue))
+                                  : page.message.dueDate
+                                    ? qsTr("Due: %1").arg(Format.formatDate(page.message.dueDate, Formatter.DateFull)) : ""
+                            color: Theme.highlightColor
+                        }
+                        Label {
+                            text: qsTr("Tap to add to calendar")
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            color: Theme.secondaryHighlightColor
+                        }
+                    }
+                }
+            }
+
+            Separator {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                color: Theme.secondaryHighlightColor
+                horizontalAlignment: Qt.AlignHCenter
+            }
+
+            // content
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
@@ -174,8 +243,9 @@ Page {
                 text: html ? page.message.html : page.message.body
                 textFormat: html ? Text.StyledText : Text.PlainText
                 wrapMode: Text.Wrap
-                color: Theme.highlightColor
-                linkColor: Theme.primaryColor
+                color: Theme.primaryColor
+                linkColor: Theme.highlightColor
+                lineHeight: 1.15
                 onLinkActivated: Qt.openUrlExternally(link)
             }
 
@@ -237,6 +307,13 @@ Page {
                         width: parent.width
                         height: Theme.itemSizeSmall
                         onClicked: page.download(modelData.name)
+                        Rectangle {   // card
+                            anchors { fill: parent; leftMargin: Theme.horizontalPageMargin / 2
+                                      rightMargin: Theme.horizontalPageMargin / 2; topMargin: Theme.paddingSmall / 2
+                                      bottomMargin: Theme.paddingSmall / 2 }
+                            radius: Theme.paddingSmall
+                            color: Theme.rgba(Theme.highlightBackgroundColor, 0.12)
+                        }
                         Image {
                             id: fileIcon
                             x: Theme.horizontalPageMargin

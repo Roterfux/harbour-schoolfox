@@ -1,5 +1,6 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
+import "../util.js" as Util
 
 Page {
     id: page
@@ -11,6 +12,16 @@ Page {
     readonly property var shown: SchoolFox.unreadOnly
         ? SchoolFox.messages.filter(function(m) { return !m.read || page.keepVisible[m.id] })
         : SchoolFox.messages
+    readonly property bool manyChildren: SchoolFox.pupils.length > 1
+
+    function dayLabel(d) {
+        if (!d) return ""
+        var n = Util.daysAgo(d)
+        if (n === 0) return qsTr("Today")
+        if (n === 1) return qsTr("Yesterday")
+        if (n < 7) return Format.formatDate(d, Formatter.WeekdayNameStandalone)
+        return Format.formatDate(d, Formatter.DateLong)
+    }
 
     // Show login on top when not logged in.
     function checkLogin() {
@@ -30,9 +41,9 @@ Page {
         model: page.shown
 
         header: PageHeader {
-            title: "SchoolFox"
-            description: (SchoolFox.unreadOnly ? qsTr("Unread only") + " · " : "")
-                         + (SchoolFox.unreadCount > 0 ? qsTr("%n unread", "", SchoolFox.unreadCount) : "")
+            title: SchoolFox.unreadOnly ? qsTr("Unread") : qsTr("Messages")
+            description: SchoolFox.unreadCount > 0 ? qsTr("%n unread", "", SchoolFox.unreadCount)
+                                                   : SchoolFox.loggedIn ? qsTr("All read") : ""
         }
 
         PullDownMenu {
@@ -67,58 +78,121 @@ Page {
             }
         }
 
-        delegate: ListItem {
-            id: item
-            contentHeight: col.height + 2 * Theme.paddingMedium
-            property var msg: modelData
+        delegate: Column {
+            id: entry
+            width: listView.width
+            readonly property var msg: modelData
+            readonly property bool newDay: index === 0
+                || Util.dayKey(page.shown[index - 1].date) !== Util.dayKey(msg.date)
 
-            Column {
-                id: col
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                anchors.verticalCenter: parent.verticalCenter
-
-                Label {
-                    width: parent.width - (clip.visible ? clip.width + Theme.paddingSmall : 0)
-                    text: msg.title
-                    truncationMode: TruncationMode.Fade
-
-                    Image {
-                        id: clip
-                        anchors { left: parent.right; leftMargin: Theme.paddingSmall
-                                  verticalCenter: parent.verticalCenter }
-                        visible: msg.attachments > 0
-                        source: "image://theme/icon-s-attach?" + (item.highlighted ? Theme.highlightColor : Theme.primaryColor)
-                    }
-                    font.bold: !msg.read
-                    color: item.highlighted || !msg.read ? Theme.highlightColor : Theme.primaryColor
-                }
-                Label {
-                    width: parent.width
-                    text: [msg.sender, msg.pupil, Format.formatDate(msg.date, Formatter.TimepointRelative)]
-                          .filter(function(x) { return x }).join(" · ")
-                    truncationMode: TruncationMode.Fade
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                    color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
-                }
-                Label {
-                    width: parent.width
-                    visible: text !== ""
-                    text: (msg.body || "").trim().replace(/\s+/g, " ")
-                    maximumLineCount: 2
-                    wrapMode: Text.Wrap
-                    elide: Text.ElideRight
-                    font.pixelSize: Theme.fontSizeSmall
-                    color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
-                }
+            SectionHeader {
+                visible: entry.newDay && text !== ""
+                text: page.dayLabel(msg.date)
             }
 
-            onClicked: {
-                var k = page.keepVisible
-                k[msg.id] = true
-                page.keepVisible = k
-                SchoolFox.markRead(msg.id)
-                pageStack.animatorPush(Qt.resolvedUrl("MessagePage.qml"), { message: msg })
+            ListItem {
+                id: item
+                contentHeight: Math.max(col.height, badge.height) + 2 * Theme.paddingMedium
+
+                // unread marker
+                Rectangle {
+                    visible: !msg.read
+                    width: Theme.paddingSmall
+                    height: col.height
+                    radius: width / 2
+                    x: Theme.horizontalPageMargin / 2 - width / 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Theme.highlightColor
+                }
+
+                // child badge (only with several children)
+                Rectangle {
+                    id: badge
+                    visible: page.manyChildren && (msg.pupil || "") !== ""
+                    width: visible ? Theme.iconSizeMedium : 0
+                    height: Theme.iconSizeMedium
+                    radius: width / 2
+                    x: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: Util.childColor(msg.pupil)
+                    opacity: msg.read ? 0.6 : 1
+                    Label {
+                        anchors.centerIn: parent
+                        text: Util.initials(msg.pupil)
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        font.bold: true
+                        color: "white"
+                    }
+                }
+
+                Column {
+                    id: col
+                    anchors {
+                        left: badge.visible ? badge.right : parent.left
+                        leftMargin: badge.visible ? Theme.paddingMedium : Theme.horizontalPageMargin
+                        right: parent.right
+                        rightMargin: Theme.horizontalPageMargin
+                        verticalCenter: parent.verticalCenter
+                    }
+                    spacing: Theme.paddingSmall / 2
+
+                    Item {
+                        width: parent.width
+                        height: titleLabel.height
+                        Label {
+                            id: titleLabel
+                            width: parent.width - timeLabel.width - (clipIcon.visible ? clipIcon.width : 0) - Theme.paddingMedium
+                            text: msg.title
+                            truncationMode: TruncationMode.Fade
+                            font.bold: !msg.read
+                            color: item.highlighted || !msg.read ? Theme.highlightColor : Theme.primaryColor
+                        }
+                        Image {
+                            id: clipIcon
+                            anchors { right: timeLabel.left; rightMargin: Theme.paddingSmall
+                                      verticalCenter: titleLabel.verticalCenter }
+                            visible: msg.attachments > 0
+                            source: "image://theme/icon-s-attach?" + (item.highlighted ? Theme.highlightColor
+                                                                                        : Theme.secondaryColor)
+                        }
+                        Label {
+                            id: timeLabel
+                            anchors { right: parent.right; baseline: titleLabel.baseline }
+                            text: msg.date ? (Util.daysAgo(msg.date) < 1
+                                              ? Format.formatDate(msg.date, Formatter.TimeValue)
+                                              : Format.formatDate(msg.date, Formatter.DateMediumWithoutYear))
+                                           : ""
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                        }
+                    }
+                    Label {
+                        width: parent.width
+                        visible: text !== ""
+                        text: Util.join([msg.sender, page.manyChildren ? "" : msg.pupil])
+                        truncationMode: TruncationMode.Fade
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                    }
+                    Label {
+                        width: parent.width
+                        visible: text !== ""
+                        text: (msg.body || "").trim().replace(/\s+/g, " ")
+                        maximumLineCount: 2
+                        wrapMode: Text.Wrap
+                        elide: Text.ElideRight
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                    }
+                }
+
+                onClicked: {
+                    var k = page.keepVisible
+                    k[msg.id] = true
+                    page.keepVisible = k
+                    SchoolFox.markRead(msg.id)
+                    pageStack.animatorPush(Qt.resolvedUrl("MessagePage.qml"), { message: msg })
+                }
             }
         }
 
@@ -127,7 +201,8 @@ Page {
             text: SchoolFox.error !== "" ? SchoolFox.error
                   : SchoolFox.unreadOnly && SchoolFox.messages.length > 0 ? qsTr("No unread messages")
                   : qsTr("No messages")
-            hintText: qsTr("Pull down to refresh")
+            hintText: SchoolFox.unreadOnly && SchoolFox.messages.length > 0
+                      ? qsTr("Pull down to show all") : qsTr("Pull down to refresh")
         }
 
         BusyIndicator {
