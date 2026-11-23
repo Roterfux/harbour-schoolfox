@@ -2,7 +2,7 @@ TARGET = harbour-schoolfox
 
 CONFIG += sailfishapp sailfishapp_i18n link_pkgconfig
 QT += network dbus
-PKGCONFIG += keepalive nemonotifications-qt5
+PKGCONFIG += sailfishapp keepalive nemonotifications-qt5
 
 HEADERS += \
     src/appservice.h \
