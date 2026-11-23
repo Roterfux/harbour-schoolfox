@@ -79,9 +79,17 @@ Page {
                 anchors.verticalCenter: parent.verticalCenter
 
                 Label {
-                    width: parent.width
+                    width: parent.width - (clip.visible ? clip.width + Theme.paddingSmall : 0)
                     text: msg.title
                     truncationMode: TruncationMode.Fade
+
+                    Image {
+                        id: clip
+                        anchors { left: parent.right; leftMargin: Theme.paddingSmall
+                                  verticalCenter: parent.verticalCenter }
+                        visible: msg.attachments > 0
+                        source: "image://theme/icon-s-attach?" + (item.highlighted ? Theme.highlightColor : Theme.primaryColor)
+                    }
                     font.bold: !msg.read
                     color: item.highlighted || !msg.read ? Theme.highlightColor : Theme.primaryColor
                 }

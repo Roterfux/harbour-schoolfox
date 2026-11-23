@@ -262,80 +262,90 @@
 <context>
     <name>MessagePage</name>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="61"/>
-        <location filename="../qml/pages/MessagePage.qml" line="176"/>
+        <location filename="../qml/pages/MessagePage.qml" line="78"/>
+        <location filename="../qml/pages/MessagePage.qml" line="202"/>
         <source>Confirmed</source>
         <translation>Bestätigt</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="63"/>
+        <location filename="../qml/pages/MessagePage.qml" line="80"/>
         <source>Confirmation failed (%1)</source>
         <translation>Bestätigung fehlgeschlagen (%1)</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="69"/>
+        <location filename="../qml/pages/MessagePage.qml" line="90"/>
         <source>Downloading %1…</source>
         <translation>Lade %1…</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="72"/>
+        <location filename="../qml/pages/MessagePage.qml" line="96"/>
         <source>Saved to %1</source>
         <translation>Gespeichert unter %1</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="83"/>
+        <location filename="../qml/pages/MessagePage.qml" line="109"/>
         <source>Cannot save calendar file</source>
         <translation>Kalenderdatei kann nicht gespeichert werden</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="99"/>
+        <location filename="../qml/pages/MessagePage.qml" line="125"/>
         <source>Add to calendar</source>
         <translation>Zum Kalender hinzufügen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="105"/>
+        <location filename="../qml/pages/MessagePage.qml" line="131"/>
         <source>Replies</source>
         <translation>Antworten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="136"/>
+        <location filename="../qml/pages/MessagePage.qml" line="162"/>
         <source>Event: %1</source>
         <translation>Termin: %1</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="139"/>
+        <location filename="../qml/pages/MessagePage.qml" line="165"/>
         <source>Due: %1</source>
         <translation>Fällig: %1</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="165"/>
+        <location filename="../qml/pages/MessagePage.qml" line="191"/>
         <source>Confirmation</source>
         <translation>Bestätigung</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="178"/>
+        <location filename="../qml/pages/MessagePage.qml" line="204"/>
         <source>This message needs a signature. Please sign it in the SchoolFox app.</source>
         <translation>Diese Nachricht braucht eine Unterschrift. Bitte in der SchoolFox-App unterschreiben.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="179"/>
+        <location filename="../qml/pages/MessagePage.qml" line="205"/>
         <source>The teacher asks you to confirm that you have read this message.</source>
         <translation>Die Lehrkraft bittet um Bestätigung, dass du diese Nachricht gelesen hast.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="186"/>
+        <location filename="../qml/pages/MessagePage.qml" line="212"/>
         <source>Confirm</source>
         <translation>Bestätigen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="187"/>
+        <location filename="../qml/pages/MessagePage.qml" line="213"/>
         <source>Confirming</source>
         <translation>Bestätige</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="192"/>
+        <location filename="../qml/pages/MessagePage.qml" line="218"/>
         <source>Attachments</source>
         <translation>Anhänge</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagePage.qml" line="225"/>
+        <source>Loading attachments…</source>
+        <translation>Lade Anhänge…</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagePage.qml" line="226"/>
+        <source>Attachments could not be loaded</source>
+        <translation>Anhänge konnten nicht geladen werden</translation>
     </message>
 </context>
 <context>
@@ -389,17 +399,17 @@
         <translation>Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="120"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="128"/>
         <source>No unread messages</source>
         <translation>Keine ungelesenen Nachrichten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="121"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="129"/>
         <source>No messages</source>
         <translation>Keine Nachrichten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="122"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="130"/>
         <source>Pull down to refresh</source>
         <translation>Zum Aktualisieren nach unten ziehen</translation>
     </message>

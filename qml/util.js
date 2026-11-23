@@ -111,3 +111,28 @@ function ics(m) {
 function join(parts) {
     return parts.filter(function(x) { return x }).join(" · ")
 }
+
+// Attachment list from any of the shapes seen/guessed for SchoolFox:
+// [ {name,size} ], {results:[…]}, {files:[…]}, {attachments:[…]}.
+function attachments(obj) {
+    if (!obj) return []
+    var list = Array.isArray(obj) ? obj : (obj.results || obj.files || obj.attachments || obj.Files || [])
+    if (!Array.isArray(list)) return []
+    var out = []
+    list.forEach(function(a) {
+        if (typeof a === "string") { out.push({ name: a, size: 0 }); return }
+        var name = first(a, ["name", "fileName", "originalFileName", "FileName", "Name", "title"])
+        if (name) out.push({ name: name, size: Number(a.size || a.fileSize || a.length || 0) })
+    })
+    return out
+}
+
+function isImage(name) {
+    return /\.(jpe?g|png|gif|webp|bmp)$/i.test(name || "")
+}
+
+function fileIcon(name) {
+    if (isImage(name)) return "image://theme/icon-m-file-image"
+    if (/\.pdf$/i.test(name || "")) return "image://theme/icon-m-file-pdf"
+    return "image://theme/icon-m-attach"
+}

@@ -10,6 +10,8 @@ Page {
     readonly property bool hasContent: (page.message.body || "").trim() !== ""
     property var detail: null
     property var attachments: []
+    property string attachState: "loading"   // loading | done | error
+    property var previews: ({})               // file name -> local path (images)
     property var myRecord: null          // recipient record for confirmation
     property bool confirmBusy: false
     property string status: ""
@@ -26,6 +28,11 @@ Page {
             if (!d) return
             console.log("schoolfox: detail keys", Object.keys(d).join(","))
             page.detail = d
+            // fallback: some replies may list files inside the message itself
+            if (page.attachments.length === 0) {
+                var inner = Util.attachments(d.files || d.attachments || d.Files || null)
+                if (inner.length > 0) page.attachments = inner
+            }
             var info = d.info || []
             for (var i = 0; i < info.length; ++i) {
                 if (info[i].userId === SchoolFox.userId
@@ -36,8 +43,18 @@ Page {
             }
         })
         SchoolFox.api("GET", "api/Files/Messages/" + page.message.id, null, function(code, body) {
-            var list = code === 200 ? Util.parse(body) : null
-            page.attachments = Array.isArray(list) ? list : []
+            if (code === 200) {
+                var parsed = Util.parse(body)
+                var list = Util.attachments(parsed)
+                if (parsed && !Array.isArray(parsed))
+                    console.log("schoolfox: attachment reply keys", Object.keys(parsed).join(","))
+                if (list.length > 0 || page.attachments.length === 0)
+                    page.attachments = list
+                page.attachState = "done"
+            } else {
+                page.attachState = code === 404 ? "done" : "error"
+                if (code !== 404) console.log("schoolfox: attachment list failed", code)
+            }
         })
     }
 
@@ -66,14 +83,23 @@ Page {
     }
 
     function download(name) {
+        if (page.previews[name]) {   // already here
+            Qt.openUrlExternally("file://" + page.previews[name])
+            return
+        }
         page.status = qsTr("Downloading %1…").arg(name)
         SchoolFox.downloadAttachment(page.message.id, name, function(ok, result) {
-            if (ok) {
-                page.status = qsTr("Saved to %1").arg(result)
-                Qt.openUrlExternally("file://" + result)
-            } else {
+            if (!ok) {
                 page.status = result
+                return
             }
+            page.status = qsTr("Saved to %1").arg(result)
+            var p = page.previews
+            p[name] = result
+            page.previews = p
+            page.previewsChanged()
+            if (!Util.isImage(name))   // images are shown inline; tap again to open
+                Qt.openUrlExternally("file://" + result)
         })
     }
 
@@ -190,28 +216,57 @@ Page {
             // --- attachments ---
             SectionHeader {
                 text: qsTr("Attachments")
-                visible: page.attachments.length > 0
+                visible: page.attachments.length > 0 || page.attachState !== "done"
+            }
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                visible: page.attachState !== "done" && !SchoolFox.demo
+                text: page.attachState === "loading" ? qsTr("Loading attachments…")
+                                                     : qsTr("Attachments could not be loaded")
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryHighlightColor
             }
             Repeater {
                 model: page.attachments
-                BackgroundItem {
+                Column {
                     width: column.width
-                    height: Theme.itemSizeSmall
-                    onClicked: page.download(modelData.name)
-                    Image {
-                        id: fileIcon
-                        x: Theme.horizontalPageMargin
-                        anchors.verticalCenter: parent.verticalCenter
-                        source: "image://theme/icon-m-attach"
-                    }
-                    Label {
-                        anchors {
-                            left: fileIcon.right; leftMargin: Theme.paddingMedium
-                            right: parent.right; rightMargin: Theme.horizontalPageMargin
-                            verticalCenter: parent.verticalCenter
+                    readonly property string localPath: page.previews[modelData.name] || ""
+
+                    BackgroundItem {
+                        width: parent.width
+                        height: Theme.itemSizeSmall
+                        onClicked: page.download(modelData.name)
+                        Image {
+                            id: fileIcon
+                            x: Theme.horizontalPageMargin
+                            anchors.verticalCenter: parent.verticalCenter
+                            source: Util.fileIcon(modelData.name)
                         }
-                        text: modelData.name + (modelData.size ? "  (" + Format.formatFileSize(modelData.size) + ")" : "")
-                        truncationMode: TruncationMode.Fade
+                        Label {
+                            anchors {
+                                left: fileIcon.right; leftMargin: Theme.paddingMedium
+                                right: parent.right; rightMargin: Theme.horizontalPageMargin
+                                verticalCenter: parent.verticalCenter
+                            }
+                            text: modelData.name + (modelData.size ? "  (" + Format.formatFileSize(modelData.size) + ")" : "")
+                            truncationMode: TruncationMode.Fade
+                        }
+                    }
+
+                    // inline preview of downloaded pictures; tap to open in Gallery
+                    Image {
+                        x: Theme.horizontalPageMargin
+                        width: parent.width - 2 * Theme.horizontalPageMargin
+                        visible: localPath !== "" && Util.isImage(modelData.name)
+                        source: visible ? "file://" + localPath : ""
+                        fillMode: Image.PreserveAspectFit
+                        asynchronous: true
+                        sourceSize.width: width
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: Qt.openUrlExternally("file://" + localPath)
+                        }
                     }
                 }
             }

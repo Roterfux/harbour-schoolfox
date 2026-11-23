@@ -749,6 +749,23 @@ QVariantMap SchoolFoxClient::parseMessage(const QVariantMap &row, const QVariant
     m.insert(QStringLiteral("dueDate"), parseDate(row.value(QStringLiteral("dueDate")).toString()));
     m.insert(QStringLiteral("date"), date);
     m.insert(QStringLiteral("serverRead"), row.value(QStringLiteral("isRead")).toBool());
+    // Attachment hint for the list; field name not confirmed, so try several.
+    int files = -1;
+    for (const QString &k : QStringList() << QStringLiteral("filesCount") << QStringLiteral("fileCount")
+                                         << QStringLiteral("attachmentsCount") << QStringLiteral("numberOfFiles")) {
+        if (row.contains(k)) { files = row.value(k).toInt(); break; }
+    }
+    if (files < 0) {
+        for (const QString &k : QStringList() << QStringLiteral("files") << QStringLiteral("attachments")) {
+            if (row.value(k).type() == QVariant::List) { files = row.value(k).toList().size(); break; }
+        }
+    }
+    if (files < 0) {
+        for (const QString &k : QStringList() << QStringLiteral("hasFiles") << QStringLiteral("hasAttachments")) {
+            if (row.contains(k)) { files = row.value(k).toBool() ? 1 : 0; break; }
+        }
+    }
+    m.insert(QStringLiteral("attachments"), files);
     return m;
 }
 
@@ -958,6 +975,7 @@ void SchoolFoxClient::demoFetchMessages()
         m.insert(QStringLiteral("pupil"), QStringLiteral("Demo child"));
         m.insert(QStringLiteral("pupilId"), QStringLiteral("demo-pupil"));
         m.insert(QStringLiteral("date"), now.addSecs(-3600 * (count - i)));
+        m.insert(QStringLiteral("attachments"), i == 1 ? 1 : 0);
         list.append(m);
     }
     handleMessages(list);
