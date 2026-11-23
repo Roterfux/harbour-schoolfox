@@ -5,6 +5,13 @@ Page {
     id: page
     allowedOrientations: Orientation.All
 
+    // Unread filter (remembered). A message opened from the filtered list
+    // stays visible until the next refresh, so the list does not jump.
+    property var keepVisible: ({})
+    readonly property var shown: SchoolFox.unreadOnly
+        ? SchoolFox.messages.filter(function(m) { return !m.read || page.keepVisible[m.id] })
+        : SchoolFox.messages
+
     // Show login on top when not logged in.
     function checkLogin() {
         if (!SchoolFox.loggedIn && status === PageStatus.Active)
@@ -14,17 +21,18 @@ Page {
     Connections {
         target: SchoolFox
         onLoggedInChanged: page.checkLogin()
+        onRefreshFinished: page.keepVisible = {}
     }
 
     SilicaListView {
         id: listView
         anchors.fill: parent
-        model: SchoolFox.messages
+        model: page.shown
 
         header: PageHeader {
             title: "SchoolFox"
-            description: SchoolFox.unreadCount > 0
-                         ? qsTr("%n unread", "", SchoolFox.unreadCount) : ""
+            description: (SchoolFox.unreadOnly ? qsTr("Unread only") + " · " : "")
+                         + (SchoolFox.unreadCount > 0 ? qsTr("%n unread", "", SchoolFox.unreadCount) : "")
         }
 
         PullDownMenu {
@@ -47,6 +55,10 @@ Page {
                 text: qsTr("Events and due dates")
                 visible: SchoolFox.loggedIn && !SchoolFox.demo
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl("EventsPage.qml"))
+            }
+            MenuItem {
+                text: SchoolFox.unreadOnly ? qsTr("Show all") : qsTr("Show only unread")
+                onClicked: { page.keepVisible = {}; SchoolFox.unreadOnly = !SchoolFox.unreadOnly }
             }
             MenuItem {
                 text: qsTr("Refresh")
@@ -94,6 +106,9 @@ Page {
             }
 
             onClicked: {
+                var k = page.keepVisible
+                k[msg.id] = true
+                page.keepVisible = k
                 SchoolFox.markRead(msg.id)
                 pageStack.animatorPush(Qt.resolvedUrl("MessagePage.qml"), { message: msg })
             }
@@ -101,7 +116,9 @@ Page {
 
         ViewPlaceholder {
             enabled: listView.count === 0 && !SchoolFox.busy
-            text: SchoolFox.error !== "" ? SchoolFox.error : qsTr("No messages")
+            text: SchoolFox.error !== "" ? SchoolFox.error
+                  : SchoolFox.unreadOnly && SchoolFox.messages.length > 0 ? qsTr("No unread messages")
+                  : qsTr("No messages")
             hintText: qsTr("Pull down to refresh")
         }
 

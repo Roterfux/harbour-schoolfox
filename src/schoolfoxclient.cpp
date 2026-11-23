@@ -166,6 +166,7 @@ void SchoolFoxClient::reloadSettings()
     m_notificationContent = m_settings.value(QStringLiteral("notify/content"), true).toBool();
     m_rememberPassword = m_settings.value(QStringLiteral("auth/remember"), true).toBool();
     m_markReadOnServer = m_settings.value(QStringLiteral("read/server"), false).toBool();
+    m_unreadOnly = m_settings.value(QStringLiteral("view/unreadOnly"), false).toBool();
     m_readIds = toSet(m_settings.value(QStringLiteral("state/read")).toStringList());
     emit settingsChanged();
 }
@@ -230,6 +231,14 @@ void SchoolFoxClient::setMarkReadOnServer(bool on)
         return;
     m_markReadOnServer = on;
     setSetting(QStringLiteral("read/server"), on);
+}
+
+void SchoolFoxClient::setUnreadOnly(bool on)
+{
+    if (on == m_unreadOnly)
+        return;
+    m_unreadOnly = on;
+    setSetting(QStringLiteral("view/unreadOnly"), on);
 }
 
 QDateTime SchoolFoxClient::lastBackgroundCheck() const

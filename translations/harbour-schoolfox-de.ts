@@ -340,8 +340,13 @@
 </context>
 <context>
     <name>MessagesPage</name>
+    <message>
+        <location filename="../qml/pages/MessagesPage.qml" line="34"/>
+        <source>Unread only</source>
+        <translation>Nur ungelesene</translation>
+    </message>
     <message numerus="yes">
-        <location filename="../qml/pages/MessagesPage.qml" line="27"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="35"/>
         <source>%n unread</source>
         <translation>
             <numerusform>%n ungelesen</numerusform>
@@ -349,37 +354,52 @@
         </translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="33"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="41"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="37"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="45"/>
         <source>Report absence</source>
         <translation>Abwesenheit melden</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="42"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="50"/>
         <source>Chats</source>
         <translation>Chats</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="47"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="55"/>
         <source>Events and due dates</source>
         <translation>Termine und Fristen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="52"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="60"/>
+        <source>Show all</source>
+        <translation>Alle zeigen</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagesPage.qml" line="60"/>
+        <source>Show only unread</source>
+        <translation>Nur ungelesene zeigen</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagesPage.qml" line="64"/>
         <source>Refresh</source>
         <translation>Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="104"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="120"/>
+        <source>No unread messages</source>
+        <translation>Keine ungelesenen Nachrichten</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagesPage.qml" line="121"/>
         <source>No messages</source>
         <translation>Keine Nachrichten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="105"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="122"/>
         <source>Pull down to refresh</source>
         <translation>Zum Aktualisieren nach unten ziehen</translation>
     </message>
@@ -387,12 +407,12 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="417"/>
+        <location filename="../src/schoolfoxclient.cpp" line="426"/>
         <source>Download failed (%1)</source>
         <translation>Download fehlgeschlagen (%1)</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="422"/>
+        <location filename="../src/schoolfoxclient.cpp" line="431"/>
         <source>Cannot save file</source>
         <translation>Datei kann nicht gespeichert werden</translation>
     </message>
@@ -443,59 +463,59 @@
 <context>
     <name>SchoolFoxClient</name>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="304"/>
+        <location filename="../src/schoolfoxclient.cpp" line="313"/>
         <source>Session expired, please log in again</source>
         <translation>Sitzung abgelaufen, bitte neu anmelden</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="379"/>
+        <location filename="../src/schoolfoxclient.cpp" line="388"/>
         <source>Invalid file</source>
         <translation>Ungültige Datei</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="391"/>
+        <location filename="../src/schoolfoxclient.cpp" line="400"/>
         <source>Cannot save file</source>
         <translation>Datei kann nicht gespeichert werden</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="405"/>
+        <location filename="../src/schoolfoxclient.cpp" line="414"/>
         <source>Download failed (%1)</source>
         <translation>Download fehlgeschlagen (%1)</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="467"/>
+        <location filename="../src/schoolfoxclient.cpp" line="476"/>
         <source>Wrong email or password</source>
         <translation>Falsche E-Mail oder falsches Passwort</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="472"/>
-        <location filename="../src/schoolfoxclient.cpp" line="497"/>
+        <location filename="../src/schoolfoxclient.cpp" line="481"/>
+        <location filename="../src/schoolfoxclient.cpp" line="506"/>
         <source>Login failed: %1</source>
         <translation>Anmeldung fehlgeschlagen: %1</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="493"/>
+        <location filename="../src/schoolfoxclient.cpp" line="502"/>
         <source>Wrong code</source>
         <translation>Falscher Code</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="513"/>
+        <location filename="../src/schoolfoxclient.cpp" line="522"/>
         <source>Login failed: unexpected server reply</source>
         <translation>Anmeldung fehlgeschlagen: unerwartete Antwort</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="522"/>
+        <location filename="../src/schoolfoxclient.cpp" line="531"/>
         <source>Your school requires two-factor login. Set it up in the SchoolFox web app first.</source>
         <translation>Deine Schule verlangt eine Zwei-Faktor-Anmeldung. Bitte zuerst in der SchoolFox-Web-App einrichten.</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="610"/>
-        <location filename="../src/schoolfoxclient.cpp" line="685"/>
+        <location filename="../src/schoolfoxclient.cpp" line="619"/>
+        <location filename="../src/schoolfoxclient.cpp" line="694"/>
         <source>Refresh failed: %1</source>
         <translation>Aktualisieren fehlgeschlagen: %1</translation>
     </message>
     <message>
-        <location filename="../src/schoolfoxclient.cpp" line="645"/>
+        <location filename="../src/schoolfoxclient.cpp" line="654"/>
         <source>No child found in this SchoolFox account</source>
         <translation>Kein Kind in diesem SchoolFox-Konto gefunden</translation>
     </message>

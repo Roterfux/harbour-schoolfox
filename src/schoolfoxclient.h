@@ -46,6 +46,7 @@ class SchoolFoxClient : public QObject
     Q_PROPERTY(bool notificationContent READ notificationContent WRITE setNotificationContent NOTIFY settingsChanged)
     Q_PROPERTY(bool rememberPassword READ rememberPassword WRITE setRememberPassword NOTIFY settingsChanged)
     Q_PROPERTY(bool markReadOnServer READ markReadOnServer WRITE setMarkReadOnServer NOTIFY settingsChanged)
+    Q_PROPERTY(bool unreadOnly READ unreadOnly WRITE setUnreadOnly NOTIFY settingsChanged)
     Q_PROPERTY(QDateTime lastBackgroundCheck READ lastBackgroundCheck NOTIFY settingsChanged)
 
 public:
@@ -78,6 +79,8 @@ public:
     bool markReadOnServer() const { return m_markReadOnServer; }
     void setMarkReadOnServer(bool on);
     QDateTime lastBackgroundCheck() const;
+    bool unreadOnly() const { return m_unreadOnly; }
+    void setUnreadOnly(bool on);
 
     Q_INVOKABLE void login(const QString &username, const QString &password);
     Q_INVOKABLE void submitTwoFactorCode(const QString &code);
@@ -164,6 +167,7 @@ private:
     bool m_notificationContent = true;
     bool m_rememberPassword = true;
     bool m_markReadOnServer = false;
+    bool m_unreadOnly = false;
     QVariantList m_messages;
     QSet<QString> m_readIds;
     QHash<QString, QVariantMap> m_content;   // id -> {title, body, html} from detail calls
