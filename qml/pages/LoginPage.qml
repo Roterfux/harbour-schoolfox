@@ -44,6 +44,14 @@ Page {
                 EnterKey.onClicked: SchoolFox.login(userField.text, text)
             }
 
+            TextSwitch {
+                visible: !SchoolFox.twoFactorRequired
+                text: qsTr("Stay logged in")
+                description: qsTr("Stores the password on this phone so notifications keep working when the session expires")
+                checked: SchoolFox.rememberPassword
+                onClicked: SchoolFox.rememberPassword = checked
+            }
+
             TextField {
                 id: codeField
                 width: parent.width
@@ -87,7 +95,7 @@ Page {
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                text: qsTr("Unofficial app. Uses your SchoolFox email and password; only the session token is stored. User name \"demo\" shows fake data.")
+                text: qsTr("Unofficial app, not made by SchoolFox. User name \"demo\" shows fake data.")
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
                 wrapMode: Text.Wrap

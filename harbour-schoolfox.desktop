@@ -8,6 +8,6 @@ X-Nemo-Application-Type=silica-qt5
 X-Nemo-Single-Instance=yes
 
 [X-Sailjail]
-Permissions=Internet;Notifications
+Permissions=Internet;Notifications;Downloads
 OrganizationName=org.roterfux
 ApplicationName=harbour-schoolfox

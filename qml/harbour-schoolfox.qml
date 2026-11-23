@@ -1,7 +1,5 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
-import Nemo.Notifications 1.0
-import Nemo.KeepAlive 1.2
 import "pages"
 
 ApplicationWindow {
@@ -13,59 +11,48 @@ ApplicationWindow {
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 
-    function showMessages() {
+    property string pendingMessageId: ""
+
+    function openMessage(id) {
+        var m = SchoolFox.findMessage(id)
+        if (!m || !m.id) {
+            // not loaded yet: refresh and try again when the list arrives
+            pendingMessageId = id
+            SchoolFox.refresh()
+            return
+        }
+        pendingMessageId = ""
         while (pageStack.depth > 1)
             pageStack.pop(null, PageStackAction.Immediate)
-        app.activate()
+        SchoolFox.markRead(m.id)
+        pageStack.push(Qt.resolvedUrl("pages/MessagePage.qml"), { message: m }, PageStackAction.Immediate)
     }
 
-    // Wakes the device periodically while the app runs (also when on cover).
-    BackgroundJob {
-        id: pollJob
-        enabled: SchoolFox.loggedIn
-        frequency: {
-            var m = SchoolFox.pollMinutes
-            if (m <= 5) return BackgroundJob.FiveMinutes
-            if (m <= 10) return BackgroundJob.TenMinutes
-            if (m <= 15) return BackgroundJob.FifteenMinutes
-            if (m <= 30) return BackgroundJob.ThirtyMinutes
-            return BackgroundJob.OneHour
-        }
-        onTriggered: {
-            console.log("schoolfox: background poll")
-            SchoolFox.refresh()
-        }
+    // Notification taps (via D-Bus, see src/appservice.h)
+    Connections {
+        target: AppService
+        onOpenMessageRequested: { app.activate(); app.openMessage(id) }
+        onActivateRequested: app.activate()
     }
 
     Connections {
         target: SchoolFox
-        onRefreshFinished: if (pollJob.running) pollJob.finished()
-        onNewMessages: {
-            for (var i = 0; i < messages.length; ++i) {
-                var m = messages[i]
-                var text = SchoolFox.notificationContent ? (m.body || "").trim().replace(/\s+/g, " ") : ""
-                if (text.length > 300) text = text.substring(0, 300) + "…"
-                var who = [m.sender, m.pupil].filter(function(x) { return x }).join(" · ")
-                var n = notificationComponent.createObject(app, {
-                    summary: m.title,
-                    body: text,
-                    previewSummary: m.title,
-                    previewBody: text,
-                    subText: who,
-                    timestamp: m.date
-                })
-                n.publish()
-            }
-        }
+        onMessagesChanged: if (app.pendingMessageId !== "") app.openMessage(app.pendingMessageId)
     }
 
-    Component {
-        id: notificationComponent
-        Notification {
-            appName: "SchoolFox"
-            appIcon: "harbour-schoolfox"
-            category: "x-nemo.messaging.im"
-            onClicked: app.showMessages()
-        }
+    // The background service sends notifications. The app only refreshes its
+    // list while it is visible (or on the cover).
+    Timer {
+        interval: Math.max(5, SchoolFox.pollMinutes) * 60 * 1000
+        repeat: true
+        running: SchoolFox.loggedIn && Qt.application.active
+        onTriggered: SchoolFox.refresh()
     }
+
+    Connections {
+        target: Qt.application
+        onActiveChanged: if (Qt.application.active && SchoolFox.loggedIn) SchoolFox.refresh()
+    }
+
+    Component.onCompleted: if (SchoolFox.loggedIn) SchoolFox.refresh()
 }

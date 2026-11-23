@@ -34,6 +34,21 @@ Page {
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl("SettingsPage.qml"))
             }
             MenuItem {
+                text: qsTr("Report absence")
+                visible: SchoolFox.loggedIn && !SchoolFox.demo
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("AbsencePage.qml"))
+            }
+            MenuItem {
+                text: qsTr("Chats")
+                visible: SchoolFox.loggedIn && !SchoolFox.demo
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("ChatsPage.qml"))
+            }
+            MenuItem {
+                text: qsTr("Events and due dates")
+                visible: SchoolFox.loggedIn && !SchoolFox.demo
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("EventsPage.qml"))
+            }
+            MenuItem {
                 text: qsTr("Refresh")
                 enabled: SchoolFox.loggedIn && !SchoolFox.busy
                 onClicked: SchoolFox.refresh()

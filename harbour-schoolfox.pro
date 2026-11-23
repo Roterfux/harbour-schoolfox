@@ -1,28 +1,41 @@
 TARGET = harbour-schoolfox
 
-CONFIG += sailfishapp
-QT += network
+CONFIG += sailfishapp sailfishapp_i18n link_pkgconfig
+QT += network dbus
+PKGCONFIG += keepalive nemonotifications-qt5
 
 HEADERS += \
+    src/appservice.h \
+    src/daemon.h \
     src/schoolfoxclient.h
 
 SOURCES += \
+    src/appservice.cpp \
+    src/daemon.cpp \
     src/main.cpp \
     src/schoolfoxclient.cpp
 
-desktop.files = harbour-schoolfox.desktop
-desktop.path = /usr/share/applications
-INSTALLS += desktop
+# Background service (systemd user unit, enabled for every user session)
+systemd.files = harbour-schoolfox-daemon.service
+systemd.path = /usr/lib/systemd/user
+INSTALLS += systemd
+
+# D-Bus activation: notification taps start the app
+dbus.files = org.roterfux.harbour-schoolfox.service
+dbus.path = /usr/share/dbus-1/services
+INSTALLS += dbus
+
+TRANSLATIONS += translations/harbour-schoolfox-de.ts
 
 DISTFILES += \
     harbour-schoolfox.desktop \
+    harbour-schoolfox-daemon.service \
+    org.roterfux.harbour-schoolfox.service \
     qml/harbour-schoolfox.qml \
-    qml/cover/CoverPage.qml \
-    qml/pages/LoginPage.qml \
-    qml/pages/MessagesPage.qml \
-    qml/pages/MessagePage.qml \
-    qml/pages/SettingsPage.qml \
-    rpm/harbour-schoolfox.spec
+    qml/cover/*.qml \
+    qml/pages/*.qml \
+    rpm/harbour-schoolfox.spec \
+    translations/*.ts
 
 icons86.files = icons/86x86/harbour-schoolfox.png
 icons86.path = /usr/share/icons/hicolor/86x86/apps
