@@ -16,7 +16,7 @@ Page {
 
             PageHeader {
                 title: message.title
-                description: message.sender
+                description: [message.sender, message.pupil].filter(function(x) { return x }).join(" · ")
             }
 
             Label {
@@ -31,10 +31,13 @@ Page {
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                text: message.body
+                readonly property bool isHtml: /<[a-zA-Z][^>]*>/.test(message.html || "")
+                text: isHtml ? message.html : message.body
+                textFormat: isHtml ? Text.StyledText : Text.PlainText
                 wrapMode: Text.Wrap
-                textFormat: Text.PlainText
                 color: Theme.highlightColor
+                linkColor: Theme.primaryColor
+                onLinkActivated: Qt.openUrlExternally(link)
             }
         }
 

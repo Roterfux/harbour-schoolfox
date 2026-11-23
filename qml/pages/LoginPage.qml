@@ -9,6 +9,7 @@ Page {
     Connections {
         target: SchoolFox
         onLoggedInChanged: if (SchoolFox.loggedIn) pageStack.pop()
+        onTwoFactorRequiredChanged: if (SchoolFox.twoFactorRequired) codeField.forceActiveFocus()
     }
 
     SilicaFlickable {
@@ -25,7 +26,8 @@ Page {
             TextField {
                 id: userField
                 width: parent.width
-                label: qsTr("Email or username")
+                visible: !SchoolFox.twoFactorRequired
+                label: qsTr("Email")
                 placeholderText: label
                 text: SchoolFox.username
                 inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhNoAutoUppercase
@@ -36,16 +38,35 @@ Page {
             PasswordField {
                 id: passwordField
                 width: parent.width
+                visible: !SchoolFox.twoFactorRequired
                 EnterKey.enabled: userField.text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-enter-accept"
                 EnterKey.onClicked: SchoolFox.login(userField.text, text)
             }
 
+            TextField {
+                id: codeField
+                width: parent.width
+                visible: SchoolFox.twoFactorRequired
+                label: qsTr("Two-factor code")
+                placeholderText: label
+                inputMethodHints: Qt.ImhDigitsOnly | Qt.ImhNoPredictiveText
+                EnterKey.enabled: text.length > 0
+                EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                EnterKey.onClicked: SchoolFox.submitTwoFactorCode(text)
+            }
+
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Log in")
-                enabled: userField.text.length > 0 && !SchoolFox.busy
-                onClicked: SchoolFox.login(userField.text, passwordField.text)
+                text: SchoolFox.twoFactorRequired ? qsTr("Confirm") : qsTr("Log in")
+                enabled: !SchoolFox.busy && (SchoolFox.twoFactorRequired ? codeField.text.length > 0
+                                                                         : userField.text.length > 0)
+                onClicked: {
+                    if (SchoolFox.twoFactorRequired)
+                        SchoolFox.submitTwoFactorCode(codeField.text)
+                    else
+                        SchoolFox.login(userField.text, passwordField.text)
+                }
             }
 
             BusyIndicator {
@@ -66,7 +87,7 @@ Page {
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                text: qsTr("Unofficial app. Tip: user name \"demo\" shows fake data.")
+                text: qsTr("Unofficial app. Uses your SchoolFox email and password; only the session token is stored. User name \"demo\" shows fake data.")
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
                 wrapMode: Text.Wrap

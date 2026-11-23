@@ -59,7 +59,8 @@ Page {
                 }
                 Label {
                     width: parent.width
-                    text: msg.sender + " · " + Format.formatDate(msg.date, Formatter.TimepointRelative)
+                    text: [msg.sender, msg.pupil, Format.formatDate(msg.date, Formatter.TimepointRelative)]
+                          .filter(function(x) { return x }).join(" · ")
                     truncationMode: TruncationMode.Fade
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: item.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor

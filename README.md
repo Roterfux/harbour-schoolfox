@@ -5,13 +5,25 @@ new messages and shows them as Sailfish notifications. No Android layer.
 
 ## Status
 
-- UI, polling, notifications, cover: done.
-- **SchoolFox API: placeholder.** SchoolFox has no public API. Fill in the
-  `API` section of `src/schoolfoxclient.cpp` (URLs, login body, auth header,
-  JSON field names) from requests captured in the SchoolFox web app
-  (browser DevTools → Network).
-- Log in with user name `demo` to test with fake data. A new fake message
-  appears every second refresh.
+- Real SchoolFox login (email + password, optional 2FA code), all children
+  in the account, message title + content, notifications with title + content.
+- Uses the private API of the SchoolFox web client (`https://api.schoolfox.com`,
+  `ZUMO-API-VERSION: 2.0.0`, `X-ZUMO-AUTH` token). Routes and field names come
+  from the public reverse-engineered projects
+  [zagushka/schoolfox-mcp](https://github.com/zagushka/schoolfox-mcp) and
+  [emanuelplopu/SchoolFoxAPI](https://github.com/emanuelplopu/SchoolFoxAPI).
+  SchoolFox can change this API at any time.
+- User name `demo` shows fake data.
+
+| Step | Request |
+| --- | --- |
+| Login | `POST api/Users/login` `{username, password, applicationType: "SchoolFox"}` |
+| 2FA | `POST api/2fa/login` `{password: code}` with temporary token |
+| Children | `GET api/Common/Inventory`, items with `itemType: "Pupil"` |
+| Messages | `GET tables/Messages?$filter=Deleted eq false and SchoolClassId eq '…' and PupilId eq '…'` |
+| Renew | `GET api/Users/login/token` on HTTP 401 |
+
+Messages are not marked read on the server; "read" is local only.
 
 ## Build (sfdk)
 

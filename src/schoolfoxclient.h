@@ -5,22 +5,28 @@
 #include <QSet>
 #include <QSettings>
 #include <QVariantList>
+#include <functional>
+
+#include <QNetworkReply>
 
 class QNetworkAccessManager;
-class QNetworkReply;
 
 /*
- * Talks to SchoolFox and keeps the message list.
+ * Talks to the private SchoolFox web API (https://api.schoolfox.com, the same
+ * contract the my.schoolfox.app web client uses) and keeps the message list.
  *
- * SchoolFox has no public API. Everything server-specific lives in the
- * "API" section of schoolfoxclient.cpp (URLs, request bodies, JSON parsing).
- * Until real requests are captured, log in with username "demo" to use
- * built-in fake data.
+ * Flow: POST api/Users/login -> (optional POST api/2fa/login) -> token
+ *       GET api/Common/Inventory -> pupils (itemType "Pupil")
+ *       GET tables/Messages?$filter=... per pupil -> {results, count}
+ *       401 -> GET api/Users/login/token (renew), else log in again.
+ *
+ * Log in with user name "demo" to use built-in fake data.
  */
 class SchoolFoxClient : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool loggedIn READ loggedIn NOTIFY loggedInChanged)
+    Q_PROPERTY(bool twoFactorRequired READ twoFactorRequired NOTIFY twoFactorRequiredChanged)
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(QString error READ error NOTIFY errorChanged)
     Q_PROPERTY(QString username READ username NOTIFY loggedInChanged)
@@ -32,6 +38,7 @@ public:
     explicit SchoolFoxClient(QObject *parent = nullptr);
 
     bool loggedIn() const { return !m_token.isEmpty(); }
+    bool twoFactorRequired() const { return !m_pendingToken.isEmpty(); }
     bool busy() const { return m_busy; }
     QString error() const { return m_error; }
     QString username() const { return m_username; }
@@ -41,38 +48,51 @@ public:
     void setPollMinutes(int minutes);
 
     Q_INVOKABLE void login(const QString &username, const QString &password);
+    Q_INVOKABLE void submitTwoFactorCode(const QString &code);
     Q_INVOKABLE void logout();
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void markRead(const QString &id);
 
 signals:
     void loggedInChanged();
+    void twoFactorRequiredChanged();
     void busyChanged();
     void errorChanged();
     void messagesChanged();
     void pollMinutesChanged();
-    // Messages not seen before. Each item: {id, title, body, sender, date, read}
+    // Messages not seen before. Each item: {id, title, body, html, sender, pupil, date, read}
     void newMessages(const QVariantList &messages);
     // Emitted after every refresh attempt, success or not (for BackgroundJob.finished()).
     void refreshFinished();
 
 private:
-    // --- API (replace with real SchoolFox calls) ---
-    void apiLogin(const QString &username, const QString &password);
-    void apiFetchMessages();
-    QVariantList parseMessages(const QByteArray &json) const;
+    typedef std::function<void(int status, const QByteArray &data, QNetworkReply::NetworkError err,
+                               const QString &errString)> Handler;
 
-    // --- demo mode ---
+    QNetworkReply *send(const QByteArray &method, const QString &path,
+                        const QByteArray &body, const QString &token);
+    void call(const QByteArray &method, const QString &path, const QByteArray &body,
+              const QString &token, Handler handler);
+    void apiGet(const QString &path, Handler handler, bool allowRenew = true);
+
+    bool acceptLogin(const QByteArray &data, bool afterTwoFactor);
+    void fetchInventory();
+    void fetchPupilMessages(int index);
+    void finishRefresh(bool ok);
+    QVariantMap parseMessage(const QVariantMap &row, const QString &pupilName) const;
+
     void demoFetchMessages();
 
     void handleMessages(const QVariantList &fresh);
     void setBusy(bool busy);
     void setError(const QString &error);
     void setToken(const QString &token);
+    void setPendingToken(const QString &token);
 
     QNetworkAccessManager *m_nam;
     QSettings m_settings;
     QString m_token;
+    QString m_pendingToken;   // temporary token while waiting for 2FA code
     QString m_username;
     QString m_error;
     bool m_busy = false;
@@ -81,6 +101,10 @@ private:
     QSet<QString> m_seenIds;
     QSet<QString> m_readIds;
     int m_demoCounter = 0;
+
+    // refresh state
+    QVariantList m_pupils;        // {pupilId, classId, name}
+    QVariantList m_collected;
 };
 
 #endif // SCHOOLFOXCLIENT_H
