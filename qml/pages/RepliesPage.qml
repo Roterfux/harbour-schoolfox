@@ -86,25 +86,39 @@ Page {
         model: replies
         header: PageHeader { title: qsTr("Replies"); description: page.message.title }
 
-        delegate: ListItem {
-            contentHeight: col.height + 2 * Theme.paddingSmall
-            Column {
-                id: col
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                anchors.verticalCenter: parent.verticalCenter
-                Label {
-                    width: parent.width
-                    text: Util.join([model.who, model.when ? Format.formatDate(new Date(model.when), Formatter.TimepointRelative) : ""])
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                    color: Theme.secondaryHighlightColor
-                }
-                Label {
-                    width: parent.width
-                    text: model.text
-                    wrapMode: Text.Wrap
-                    horizontalAlignment: Text.AlignJustify
-                    color: Theme.highlightColor
+        delegate: Item {
+            width: list.width
+            height: bubble.height + Theme.paddingSmall
+            readonly property bool mine: model.who !== "" && model.who === SchoolFox.fullName
+            Rectangle {
+                id: bubble
+                width: Math.min(list.width * 0.8,
+                                Math.max(meta.implicitWidth, body.implicitWidth) + 2 * Theme.paddingMedium)
+                height: bcol.height + 2 * Theme.paddingSmall
+                x: parent.mine ? list.width - width - Theme.horizontalPageMargin : Theme.horizontalPageMargin
+                radius: Theme.paddingMedium
+                color: parent.mine ? Theme.rgba(Theme.highlightBackgroundColor, 0.25)
+                                   : Theme.rgba(Theme.primaryColor, 0.08)
+                Column {
+                    id: bcol
+                    x: Theme.paddingMedium
+                    y: Theme.paddingSmall
+                    width: bubble.width - 2 * Theme.paddingMedium
+                    Label {
+                        id: meta
+                        width: parent.width
+                        text: Util.join([model.who, model.when ? Format.formatDate(new Date(model.when), Formatter.TimepointRelative) : ""])
+                        font.pixelSize: Theme.fontSizeTiny
+                        color: Theme.secondaryHighlightColor
+                        truncationMode: TruncationMode.Fade
+                    }
+                    Label {
+                        id: body
+                        width: parent.width
+                        text: model.text
+                        wrapMode: Text.Wrap
+                        color: Theme.highlightColor
+                    }
                 }
             }
         }

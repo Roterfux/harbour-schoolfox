@@ -23,6 +23,20 @@ Page {
 
             PageHeader { title: qsTr("SchoolFox login") }
 
+            Image {
+                anchors.horizontalCenter: parent.horizontalCenter
+                source: "/usr/share/icons/hicolor/172x172/apps/harbour-schoolfox.png"
+                width: Theme.iconSizeExtraLarge
+                height: width
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Messages from school, right on your phone")
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.secondaryHighlightColor
+            }
+            Item { width: 1; height: Theme.paddingLarge }
+
             TextField {
                 id: userField
                 width: parent.width

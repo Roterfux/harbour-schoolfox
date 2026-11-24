@@ -71,27 +71,39 @@ Page {
             MenuItem { text: qsTr("Refresh"); onClicked: page.load() }
         }
 
-        delegate: ListItem {
-            contentHeight: col.height + 2 * Theme.paddingSmall
-            Column {
-                id: col
-                x: modelData.mine ? Theme.horizontalPageMargin * 3 : Theme.horizontalPageMargin
-                width: parent.width - 4 * Theme.horizontalPageMargin
-                anchors.verticalCenter: parent.verticalCenter
-                Label {
-                    width: parent.width
-                    horizontalAlignment: modelData.mine ? Text.AlignRight : Text.AlignLeft
-                    text: Util.join([modelData.mine ? qsTr("You") : modelData.who,
-                                     modelData.when ? Format.formatDate(modelData.when, Formatter.TimepointRelative) : ""])
-                    font.pixelSize: Theme.fontSizeExtraSmall
-                    color: Theme.secondaryHighlightColor
-                }
-                Label {
-                    width: parent.width
-                    horizontalAlignment: modelData.mine ? Text.AlignRight : Text.AlignLeft
-                    text: modelData.text
-                    wrapMode: Text.Wrap
-                    color: modelData.mine ? Theme.primaryColor : Theme.highlightColor
+        delegate: Item {
+            width: list.width
+            height: bubble.height + Theme.paddingSmall
+            Rectangle {
+                id: bubble
+                readonly property real maxW: list.width * 0.8
+                width: Math.min(maxW, Math.max(meta.implicitWidth, body.implicitWidth) + 2 * Theme.paddingMedium)
+                height: bcol.height + 2 * Theme.paddingSmall
+                x: modelData.mine ? list.width - width - Theme.horizontalPageMargin : Theme.horizontalPageMargin
+                radius: Theme.paddingMedium
+                color: modelData.mine ? Theme.rgba(Theme.highlightBackgroundColor, 0.25)
+                                      : Theme.rgba(Theme.primaryColor, 0.08)
+                Column {
+                    id: bcol
+                    x: Theme.paddingMedium
+                    y: Theme.paddingSmall
+                    width: bubble.width - 2 * Theme.paddingMedium
+                    Label {
+                        id: meta
+                        width: parent.width
+                        text: Util.join([modelData.mine ? qsTr("You") : modelData.who,
+                                         modelData.when ? Format.formatDate(modelData.when, Formatter.TimepointRelative) : ""])
+                        font.pixelSize: Theme.fontSizeTiny
+                        color: Theme.secondaryHighlightColor
+                        truncationMode: TruncationMode.Fade
+                    }
+                    Label {
+                        id: body
+                        width: parent.width
+                        text: modelData.text
+                        wrapMode: Text.Wrap
+                        color: modelData.mine ? Theme.primaryColor : Theme.highlightColor
+                    }
                 }
             }
         }

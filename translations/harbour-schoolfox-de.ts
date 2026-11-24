@@ -127,27 +127,27 @@
         <translation>Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../qml/pages/ChatPage.qml" line="84"/>
+        <location filename="../qml/pages/ChatPage.qml" line="94"/>
         <source>You</source>
         <translation>Du</translation>
     </message>
     <message>
-        <location filename="../qml/pages/ChatPage.qml" line="101"/>
+        <location filename="../qml/pages/ChatPage.qml" line="113"/>
         <source>No messages</source>
         <translation>Keine Nachrichten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/ChatPage.qml" line="118"/>
+        <location filename="../qml/pages/ChatPage.qml" line="130"/>
         <source>This chat is read-only</source>
         <translation>Dieser Chat ist schreibgeschützt</translation>
     </message>
     <message>
-        <location filename="../qml/pages/ChatPage.qml" line="127"/>
+        <location filename="../qml/pages/ChatPage.qml" line="139"/>
         <source>Write a message</source>
         <translation>Nachricht schreiben</translation>
     </message>
     <message>
-        <location filename="../qml/pages/ChatPage.qml" line="128"/>
+        <location filename="../qml/pages/ChatPage.qml" line="140"/>
         <source>Message</source>
         <translation>Nachricht</translation>
     </message>
@@ -206,12 +206,12 @@
         <translation>Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../qml/pages/EventsPage.qml" line="70"/>
+        <location filename="../qml/pages/EventsPage.qml" line="100"/>
         <source>due</source>
         <translation>fällig</translation>
     </message>
     <message>
-        <location filename="../qml/pages/EventsPage.qml" line="80"/>
+        <location filename="../qml/pages/EventsPage.qml" line="112"/>
         <source>No upcoming events</source>
         <translation>Keine anstehenden Termine</translation>
     </message>
@@ -224,37 +224,42 @@
         <translation>SchoolFox-Anmeldung</translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="30"/>
+        <location filename="../qml/pages/LoginPage.qml" line="34"/>
+        <source>Messages from school, right on your phone</source>
+        <translation>Nachrichten der Schule direkt aufs Telefon</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/LoginPage.qml" line="44"/>
         <source>Email</source>
         <translation>E-Mail</translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="49"/>
+        <location filename="../qml/pages/LoginPage.qml" line="63"/>
         <source>Stay logged in</source>
         <translation>Angemeldet bleiben</translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="50"/>
+        <location filename="../qml/pages/LoginPage.qml" line="64"/>
         <source>Stores the password on this phone so notifications keep working when the session expires</source>
         <translation>Speichert das Passwort auf diesem Telefon, damit Benachrichtigungen auch nach Ablauf der Sitzung weiter funktionieren</translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="59"/>
+        <location filename="../qml/pages/LoginPage.qml" line="73"/>
         <source>Two-factor code</source>
         <translation>Zwei-Faktor-Code</translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="69"/>
+        <location filename="../qml/pages/LoginPage.qml" line="83"/>
         <source>Confirm</source>
         <translation>Bestätigen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="69"/>
+        <location filename="../qml/pages/LoginPage.qml" line="83"/>
         <source>Log in</source>
         <translation>Anmelden</translation>
     </message>
     <message>
-        <location filename="../qml/pages/LoginPage.qml" line="98"/>
+        <location filename="../qml/pages/LoginPage.qml" line="112"/>
         <source>Unofficial app, not made by SchoolFox. User name &quot;demo&quot; shows fake data.</source>
         <translation>Inoffizielle App, nicht von SchoolFox. Benutzername „demo“ zeigt Beispieldaten.</translation>
     </message>
@@ -262,7 +267,7 @@
 <context>
     <name>MessagePage</name>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="316"/>
+        <location filename="../qml/pages/MessagePage.qml" line="337"/>
         <source>Confirmed</source>
         <translation>Bestätigt</translation>
     </message>
@@ -298,6 +303,7 @@
     </message>
     <message>
         <location filename="../qml/pages/MessagePage.qml" line="164"/>
+        <location filename="../qml/pages/MessagePage.qml" line="244"/>
         <source>Replies</source>
         <translation>Antworten</translation>
     </message>
@@ -312,27 +318,32 @@
         <translation>SchoolFox</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="249"/>
+        <location filename="../qml/pages/MessagePage.qml" line="237"/>
+        <source>Calendar</source>
+        <translation>Kalender</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagePage.qml" line="270"/>
         <source>Event: %1</source>
         <translation>Termin: %1</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="252"/>
+        <location filename="../qml/pages/MessagePage.qml" line="273"/>
         <source>Due: %1</source>
         <translation>Fällig: %1</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="256"/>
+        <location filename="../qml/pages/MessagePage.qml" line="277"/>
         <source>Tap to add to calendar</source>
         <translation>Tippen zum Eintragen in den Kalender</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="295"/>
+        <location filename="../qml/pages/MessagePage.qml" line="316"/>
         <source>Confirmation</source>
         <translation>Bestätigung</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="316"/>
+        <location filename="../qml/pages/MessagePage.qml" line="337"/>
         <source>Confirmed by %1</source>
         <translation>Bestätigt von %1</translation>
     </message>
@@ -341,37 +352,37 @@
         <translation type="vanished">Diese Nachricht braucht eine Unterschrift. Bitte in der SchoolFox-App unterschreiben.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="317"/>
+        <location filename="../qml/pages/MessagePage.qml" line="338"/>
         <source>The teacher asks you to confirm that you have read this message.</source>
         <translation>Die Lehrkraft bittet um Bestätigung, dass du diese Nachricht gelesen hast.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="324"/>
+        <location filename="../qml/pages/MessagePage.qml" line="345"/>
         <source>Confirm</source>
         <translation>Bestätigen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="324"/>
+        <location filename="../qml/pages/MessagePage.qml" line="345"/>
         <source>Confirming…</source>
         <translation>Bestätige…</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="325"/>
+        <location filename="../qml/pages/MessagePage.qml" line="346"/>
         <source>Confirming</source>
         <translation>Bestätige</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="330"/>
+        <location filename="../qml/pages/MessagePage.qml" line="351"/>
         <source>Attachments</source>
         <translation>Anhänge</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="337"/>
+        <location filename="../qml/pages/MessagePage.qml" line="358"/>
         <source>Loading attachments…</source>
         <translation>Lade Anhänge…</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagePage.qml" line="338"/>
+        <location filename="../qml/pages/MessagePage.qml" line="359"/>
         <source>Attachments could not be loaded</source>
         <translation>Anhänge konnten nicht geladen werden</translation>
     </message>
@@ -393,17 +404,18 @@
         <translation>Gestern</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="44"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="46"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="79"/>
         <source>Unread</source>
         <translation>Ungelesen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="44"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="46"/>
         <source>Messages</source>
         <translation>Nachrichten</translation>
     </message>
     <message numerus="yes">
-        <location filename="../qml/pages/MessagesPage.qml" line="45"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="47"/>
         <source>%n unread</source>
         <translation>
             <numerusform>%n ungelesen</numerusform>
@@ -411,67 +423,78 @@
         </translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="46"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="48"/>
         <source>All read</source>
         <translation>Alles gelesen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="52"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="58"/>
+        <source>Events</source>
+        <translation>Termine</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagesPage.qml" line="72"/>
+        <source>Absence</source>
+        <translation>Abwesenheit</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagesPage.qml" line="79"/>
+        <source>All</source>
+        <translation>Alle</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/MessagesPage.qml" line="89"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="56"/>
         <source>Report absence</source>
-        <translation>Abwesenheit melden</translation>
+        <translation type="vanished">Abwesenheit melden</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="61"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="65"/>
         <source>Chats</source>
         <translation>Chats</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="66"/>
         <source>Events and due dates</source>
-        <translation>Termine und Fristen</translation>
+        <translation type="vanished">Termine und Fristen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="71"/>
         <source>Show all</source>
-        <translation>Alle zeigen</translation>
+        <translation type="vanished">Alle zeigen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="71"/>
         <source>Show only unread</source>
-        <translation>Nur ungelesene zeigen</translation>
+        <translation type="vanished">Nur ungelesene zeigen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="75"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="93"/>
         <source>Refresh</source>
         <translation>Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="172"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="190"/>
         <source>Please confirm</source>
         <translation>Bitte bestätigen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="211"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="229"/>
         <source>No unread messages</source>
         <translation>Keine ungelesenen Nachrichten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="212"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="230"/>
         <source>No messages</source>
         <translation>Keine Nachrichten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="214"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="232"/>
         <source>Pull down to refresh</source>
         <translation>Zum Aktualisieren nach unten ziehen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/MessagesPage.qml" line="214"/>
+        <location filename="../qml/pages/MessagesPage.qml" line="232"/>
         <source>Pull down to show all</source>
         <translation>Nach unten ziehen, um alle zu zeigen</translation>
     </message>
@@ -507,27 +530,27 @@
         <translation>Antworten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/RepliesPage.qml" line="114"/>
+        <location filename="../qml/pages/RepliesPage.qml" line="128"/>
         <source>No replies yet</source>
         <translation>Noch keine Antworten</translation>
     </message>
     <message>
-        <location filename="../qml/pages/RepliesPage.qml" line="114"/>
+        <location filename="../qml/pages/RepliesPage.qml" line="128"/>
         <source>No reply thread for this message</source>
         <translation>Kein Antwortverlauf zu dieser Nachricht</translation>
     </message>
     <message>
-        <location filename="../qml/pages/RepliesPage.qml" line="115"/>
+        <location filename="../qml/pages/RepliesPage.qml" line="129"/>
         <source>Reply threads are started in the SchoolFox app</source>
         <translation>Antwortverläufe werden in der SchoolFox-App gestartet</translation>
     </message>
     <message>
-        <location filename="../qml/pages/RepliesPage.qml" line="139"/>
+        <location filename="../qml/pages/RepliesPage.qml" line="153"/>
         <source>Write a reply</source>
         <translation>Antwort schreiben</translation>
     </message>
     <message>
-        <location filename="../qml/pages/RepliesPage.qml" line="140"/>
+        <location filename="../qml/pages/RepliesPage.qml" line="154"/>
         <source>Reply</source>
         <translation>Antwort</translation>
     </message>

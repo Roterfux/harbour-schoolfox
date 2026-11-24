@@ -40,10 +40,47 @@ Page {
         anchors.fill: parent
         model: page.shown
 
-        header: PageHeader {
-            title: SchoolFox.unreadOnly ? qsTr("Unread") : qsTr("Messages")
-            description: SchoolFox.unreadCount > 0 ? qsTr("%n unread", "", SchoolFox.unreadCount)
-                                                   : SchoolFox.loggedIn ? qsTr("All read") : ""
+        header: Column {
+            width: listView.width
+            PageHeader {
+                title: SchoolFox.unreadOnly ? qsTr("Unread") : qsTr("Messages")
+                description: SchoolFox.unreadCount > 0 ? qsTr("%n unread", "", SchoolFox.unreadCount)
+                                                       : SchoolFox.loggedIn ? qsTr("All read") : ""
+            }
+            Row {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: SchoolFox.loggedIn
+                readonly property real tile: Math.min(Theme.itemSizeExtraLarge,
+                                                      (listView.width - 2 * Theme.horizontalPageMargin) / 4)
+                ActionButton {
+                    width: parent.tile
+                    icon: "image://theme/icon-m-date"
+                    text: qsTr("Events")
+                    enabled: !SchoolFox.demo
+                    onClicked: pageStack.animatorPush(Qt.resolvedUrl("EventsPage.qml"))
+                }
+                ActionButton {
+                    width: parent.tile
+                    icon: "image://theme/icon-m-chat"
+                    text: qsTr("Chats")
+                    enabled: !SchoolFox.demo
+                    onClicked: pageStack.animatorPush(Qt.resolvedUrl("ChatsPage.qml"))
+                }
+                ActionButton {
+                    width: parent.tile
+                    icon: "image://theme/icon-m-person"
+                    text: qsTr("Absence")
+                    enabled: !SchoolFox.demo
+                    onClicked: pageStack.animatorPush(Qt.resolvedUrl("AbsencePage.qml"))
+                }
+                ActionButton {
+                    width: parent.tile
+                    icon: "image://theme/icon-m-mail?" + (SchoolFox.unreadOnly ? Theme.highlightColor : Theme.primaryColor)
+                    text: SchoolFox.unreadOnly ? qsTr("All") : qsTr("Unread")
+                    active: SchoolFox.unreadOnly
+                    onClicked: { page.keepVisible = {}; SchoolFox.unreadOnly = !SchoolFox.unreadOnly }
+                }
+            }
         }
 
         PullDownMenu {
@@ -51,25 +88,6 @@ Page {
             MenuItem {
                 text: qsTr("Settings")
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl("SettingsPage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Report absence")
-                visible: SchoolFox.loggedIn && !SchoolFox.demo
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl("AbsencePage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Chats")
-                visible: SchoolFox.loggedIn && !SchoolFox.demo
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl("ChatsPage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Events and due dates")
-                visible: SchoolFox.loggedIn && !SchoolFox.demo
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl("EventsPage.qml"))
-            }
-            MenuItem {
-                text: SchoolFox.unreadOnly ? qsTr("Show all") : qsTr("Show only unread")
-                onClicked: { page.keepVisible = {}; SchoolFox.unreadOnly = !SchoolFox.unreadOnly }
             }
             MenuItem {
                 text: qsTr("Refresh")

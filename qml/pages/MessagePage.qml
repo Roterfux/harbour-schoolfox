@@ -226,6 +226,27 @@ Page {
                 }
             }
 
+            // actions
+            Row {
+                x: Theme.horizontalPageMargin - Theme.paddingMedium
+                visible: calendarAction.visible || repliesAction.visible
+                ActionButton {
+                    id: calendarAction
+                    visible: page.icsText !== ""
+                    icon: "image://theme/icon-m-date"
+                    text: qsTr("Calendar")
+                    onClicked: page.addToCalendar()
+                }
+                ActionButton {
+                    id: repliesAction
+                    visible: page.detail !== null && page.detail.instantMessagesAllowed === true
+                    icon: "image://theme/icon-m-chat"
+                    text: qsTr("Replies")
+                    onClicked: pageStack.animatorPush(Qt.resolvedUrl("RepliesPage.qml"),
+                                                      { message: page.message, detail: page.detail })
+                }
+            }
+
             // event / due date chip
             BackgroundItem {
                 width: parent.width

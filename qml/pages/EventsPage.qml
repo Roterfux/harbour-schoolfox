@@ -52,12 +52,42 @@ Page {
         }
 
         delegate: ListItem {
-            contentHeight: col.height + 2 * Theme.paddingMedium
+            contentHeight: Math.max(col.height, tile.height) + 2 * Theme.paddingMedium
+
+            // date tile: day number + short month
+            Rectangle {
+                id: tile
+                x: Theme.horizontalPageMargin
+                anchors.verticalCenter: parent.verticalCenter
+                width: Theme.itemSizeSmall
+                height: width
+                radius: Theme.paddingSmall
+                color: Theme.rgba(Theme.highlightBackgroundColor, modelData.eventDate ? 0.25 : 0.12)
+                Column {
+                    anchors.centerIn: parent
+                    Label {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: modelData.when ? modelData.when.getDate() : ""
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.bold: true
+                        color: Theme.highlightColor
+                    }
+                    Label {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: modelData.when ? Qt.formatDate(modelData.when, "MMM") : ""
+                        font.pixelSize: Theme.fontSizeTiny
+                        color: Theme.secondaryHighlightColor
+                    }
+                }
+            }
+
             Column {
                 id: col
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                anchors.verticalCenter: parent.verticalCenter
+                anchors {
+                    left: tile.right; leftMargin: Theme.paddingMedium
+                    right: parent.right; rightMargin: Theme.horizontalPageMargin
+                    verticalCenter: parent.verticalCenter
+                }
                 Label {
                     width: parent.width
                     text: modelData.title
@@ -66,8 +96,10 @@ Page {
                 }
                 Label {
                     width: parent.width
-                    text: Util.join([modelData.when ? Format.formatDate(modelData.when, Formatter.DateFull) : "",
-                                     modelData.eventDate ? "" : qsTr("due"), modelData.pupil])
+                    text: Util.join([modelData.eventDate ? Format.formatDate(modelData.eventDate, Formatter.TimeValue)
+                                                         : qsTr("due"),
+                                     modelData.when ? Format.formatDate(modelData.when, Formatter.WeekdayNameStandalone) : "",
+                                     modelData.pupil])
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.secondaryColor
                 }
