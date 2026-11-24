@@ -2,7 +2,6 @@ import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Sailfish.WebView 1.0
 import Sailfish.WebView.Popups 1.0
-import Sailfish.WebView.Pickers 1.0
 
 // claude.ai in a WebView. Web login (email code) works as usual; if it does
 // not (e.g. Google login blocked), paste the sessionKey cookie via the menu.
@@ -29,7 +28,6 @@ Page {
         onViewInitialized: page.status = qsTr("Engine ready")
 
         popupProvider: PopupProvider {}
-        pickerProvider: PickerProvider {}
 
         PullDownMenu {
             MenuItem {
