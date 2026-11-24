@@ -2,16 +2,14 @@ TARGET = harbour-claudechat
 
 CONFIG += sailfishapp
 
+SOURCES += src/main.cpp
+
 DISTFILES += \
     harbour-claudechat.desktop \
     qml/harbour-claudechat.qml \
     qml/cover/*.qml \
     qml/pages/*.qml \
     rpm/harbour-claudechat.spec
-
-desktop.files = harbour-claudechat.desktop
-desktop.path = /usr/share/applications
-INSTALLS += desktop
 
 icons86.files = icons/86x86/harbour-claudechat.png
 icons86.path = /usr/share/icons/hicolor/86x86/apps
