@@ -1,6 +1,8 @@
 name: Build RPM (claudechat)
 
 on:
+  pull_request:
+    paths: ['harbour-claudechat/**']
   push:
     branches: [main]
     paths: ['harbour-claudechat/**']
