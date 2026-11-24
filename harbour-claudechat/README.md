@@ -1,11 +1,10 @@
 # harbour-claudechat
 
-Basic native Sailfish OS chat client for Claude (Silica/QML + C++, Qt 5.6 safe).
+Sailfish OS wrapper around the claude.ai web chat (Silica WebView). No API,
+no API key: log in on the website inside the app.
 
-- Anthropic Messages API (`POST https://api.anthropic.com/v1/messages`, no streaming).
-- Pull-down menu: settings (API key, model, system prompt) and new chat.
-- Conversation kept in memory; cover shows the last answer.
-- Settings: `~/.config/org.roterfux/harbour-claudechat/settings.conf` (mode 600, key unencrypted).
+- QML only, `Sailfish.WebView` (needs `sailfish-components-webview-qt5` on the phone).
+- Not for Harbour (WebView with a third-party site); distribute via GitHub releases, OpenRepos or Chum.
 
 ## Build (sfdk)
 

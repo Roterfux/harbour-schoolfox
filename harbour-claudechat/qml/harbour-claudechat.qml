@@ -3,7 +3,10 @@ import Sailfish.Silica 1.0
 import "pages"
 
 ApplicationWindow {
-    initialPage: Component { ChatPage {} }
+    id: app
+    property string pageTitle: ""
+
+    initialPage: Component { WebPage {} }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 }
