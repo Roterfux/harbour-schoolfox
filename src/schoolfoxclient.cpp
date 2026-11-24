@@ -752,6 +752,14 @@ QVariantMap SchoolFoxClient::parseMessage(const QVariantMap &row, const QVariant
     m.insert(QStringLiteral("dueDate"), parseDate(row.value(QStringLiteral("dueDate")).toString()));
     m.insert(QStringLiteral("date"), date);
     m.insert(QStringLiteral("serverRead"), row.value(QStringLiteral("isRead")).toBool());
+    // Read confirmation (field names seen on device in the list reply).
+    const bool signedNow = row.value(QStringLiteral("isSigned")).toBool()
+                        || !row.value(QStringLiteral("signingDate")).toString().isEmpty();
+    m.insert(QStringLiteral("needsConfirm"), row.value(QStringLiteral("hasSignature")).toBool()
+                                             || row.value(QStringLiteral("signatureRequired")).toBool());
+    m.insert(QStringLiteral("signed"), signedNow);
+    m.insert(QStringLiteral("signedBy"), row.value(QStringLiteral("signedByUserName")).toString());
+    m.insert(QStringLiteral("signingDate"), parseDate(row.value(QStringLiteral("signingDate")).toString()));
     // The list reply has no attachment field (checked on device), so the
     // paperclip is unknown (-1) here; the message page loads the real list.
     // NOTE: never range-for over "QStringList() << ..." - the temporary is

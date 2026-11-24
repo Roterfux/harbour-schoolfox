@@ -13,6 +13,13 @@ Page {
     property string attachState: "loading"   // loading | done | error
     property var previews: ({})               // file name -> local path (images)
     property var myRecord: null          // recipient record for confirmation
+    property bool confirmedNow: false
+    readonly property bool needsConfirm: page.message.needsConfirm === true
+        || (page.detail !== null && (page.detail.hasSignature === true || page.detail.signatureRequired === true))
+        || page.myRecord !== null
+    readonly property bool isSigned: page.confirmedNow || page.message.signed === true
+        || (page.detail !== null && (page.detail.isSigned === true || !!page.detail.signingDate))
+        || (page.myRecord !== null && (!!page.myRecord.signedByUserId || !!page.myRecord.signingDate))
     property bool confirmBusy: false
     property string status: ""
     readonly property string icsText: Util.ics(page.message)
@@ -33,14 +40,9 @@ Page {
                 var inner = Util.attachments(d.files || d.attachments || d.Files || null)
                 if (inner.length > 0) page.attachments = inner
             }
-            var info = d.info || []
-            for (var i = 0; i < info.length; ++i) {
-                if (info[i].userId === SchoolFox.userId
-                        && (!page.message.pupilId || info[i].pupilId === page.message.pupilId)) {
-                    page.myRecord = info[i]
-                    break
-                }
-            }
+            page.myRecord = page.pickRecord(d.info || [])
+            if (page.myRecord === null && page.needsConfirm && !page.isSigned)
+                page.findRecord()
         })
         SchoolFox.api("GET", "api/Files/Messages/" + page.message.id, null, function(code, body) {
             if (code === 200) {
@@ -64,8 +66,37 @@ Page {
         onMessageUpdated: if (message.id === page.message.id) page.message = message
     }
 
+    // Our recipient record: prefer our own user, else the one for this child.
+    function pickRecord(list) {
+        var byPupil = null
+        for (var i = 0; i < list.length; ++i) {
+            var r = list[i]
+            if (page.message.pupilId && r.pupilId && r.pupilId !== page.message.pupilId) continue
+            if (r.userId === SchoolFox.userId) return r
+            if (!byPupil) byPupil = r
+        }
+        return byPupil
+    }
+
+    // The message detail usually has no "info" list, so ask the
+    // recipient table directly (same table the web client PATCHes).
+    function findRecord() {
+        var f = "MessageId eq " + Util.q(page.message.id)
+        if (page.message.pupilId) f += " and PupilId eq " + Util.q(page.message.pupilId)
+        SchoolFox.api("GET", Util.odata("tables/MessageRelatedPupils", f, null, 50, 0), null, function(code, body) {
+            var rows = Util.results(Util.parse(body))
+            console.log("schoolfox: confirm records", code, rows.length,
+                        rows.length > 0 ? Object.keys(rows[0]).join(",") : "")
+            if (code === 200) page.myRecord = page.pickRecord(rows)
+        })
+    }
+
     function confirm() {
         var r = page.myRecord
+        if (!r || !r.id) {
+            page.status = qsTr("Could not find the confirmation entry. Please confirm in the SchoolFox app.")
+            return
+        }
         var body = {}
         for (var k in r) body[k] = r[k]
         body.signedByUserId = SchoolFox.userId
@@ -75,7 +106,9 @@ Page {
             page.confirmBusy = false
             if (code >= 200 && code < 300) {
                 page.myRecord = body
-                page.status = qsTr("Confirmed")
+                page.confirmedNow = true
+                page.status = ""
+                SchoolFox.refresh()
             } else {
                 page.status = qsTr("Confirmation failed (%1)").arg(code)
             }
@@ -260,27 +293,35 @@ Page {
             // --- confirmation ---
             SectionHeader {
                 text: qsTr("Confirmation")
-                visible: page.myRecord !== null
+                visible: page.needsConfirm || page.isSigned
             }
-            Label {
+            Row {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                visible: page.myRecord !== null
-                wrapMode: Text.Wrap
-                color: Theme.highlightColor
-                text: !page.myRecord ? ""
-                      : (page.myRecord.signedByUserId || page.myRecord.signingDate)
-                        ? qsTr("Confirmed")
-                        : page.detail && page.detail.signatureRequired === true
-                          ? qsTr("This message needs a signature. Please sign it in the SchoolFox app.")
+                spacing: Theme.paddingMedium
+                visible: page.needsConfirm || page.isSigned
+                Image {
+                    id: confirmIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: page.isSigned ? "image://theme/icon-m-acknowledge?" + Theme.highlightColor
+                                          : "image://theme/icon-m-attention?" + Theme.highlightColor
+                }
+                Label {
+                    width: parent.width - confirmIcon.width - parent.spacing
+                    anchors.verticalCenter: parent.verticalCenter
+                    wrapMode: Text.Wrap
+                    color: Theme.highlightColor
+                    text: page.isSigned
+                          ? (page.message.signedBy && !page.confirmedNow
+                             ? qsTr("Confirmed by %1").arg(page.message.signedBy) : qsTr("Confirmed"))
                           : qsTr("The teacher asks you to confirm that you have read this message.")
+                }
             }
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: page.myRecord !== null && !page.myRecord.signedByUserId && !page.myRecord.signingDate
-                         && page.detail && page.detail.signatureRequired === false
-                enabled: !page.confirmBusy
-                text: qsTr("Confirm")
+                visible: page.needsConfirm && !page.isSigned && !SchoolFox.demo
+                enabled: !page.confirmBusy && page.detail !== null
+                text: page.confirmBusy ? qsTr("Confirming…") : qsTr("Confirm")
                 onClicked: remorse.execute(qsTr("Confirming"), page.confirm)
             }
 

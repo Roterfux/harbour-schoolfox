@@ -168,6 +168,14 @@ Page {
                     }
                     Label {
                         width: parent.width
+                        visible: msg.needsConfirm === true && msg.signed !== true
+                        text: "⚠ " + qsTr("Please confirm")
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        font.bold: true
+                        color: Theme.highlightColor
+                    }
+                    Label {
+                        width: parent.width
                         visible: text !== ""
                         text: Util.join([msg.sender, page.manyChildren ? "" : msg.pupil])
                         truncationMode: TruncationMode.Fade
