@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Claude Chat
+Comment=Chat with Claude
+Icon=harbour-claudechat
+Exec=harbour-claudechat
+X-Nemo-Application-Type=silica-qt5
+X-Nemo-Single-Instance=yes
+
+[X-Sailjail]
+Permissions=Internet
+OrganizationName=org.roterfux
+ApplicationName=harbour-claudechat
