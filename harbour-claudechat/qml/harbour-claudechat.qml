@@ -6,7 +6,7 @@ ApplicationWindow {
     id: app
     property string pageTitle: ""
 
-    initialPage: Component { WebPage {} }
+    initialPage: Component { StartPage {} }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 }

@@ -1,7 +1,6 @@
 import QtQuick 2.2
 import Sailfish.Silica 1.0
 import Sailfish.WebView 1.0
-import Sailfish.WebView.Controls 1.0
 import Sailfish.WebView.Popups 1.0
 import Sailfish.WebView.Pickers 1.0
 
@@ -19,7 +18,7 @@ Page {
         web.runJavaScript(js, function() { web.url = "https://claude.ai/new" })
     }
 
-    SilicaWebView {
+    WebView {
         id: web
         anchors.fill: parent
         // Set after the page exists: the engine may not be ready at creation.
