@@ -11,8 +11,9 @@ Page {
     Component.onCompleted: {
         var c = Qt.createComponent(Qt.resolvedUrl("WebPage.qml"))
         if (c.status === Component.Ready) {
-            var o = c.createObject(page, { "anchors.fill": page })
-            if (!o) page.errorText = "createObject failed"
+            var o = c.createObject(page)
+            if (!o) page.errorText = "createObject failed: " + c.errorString()
+            else { o.width = Qt.binding(function() { return page.width }); o.height = Qt.binding(function() { return page.height }) }
         } else {
             page.errorText = c.errorString()
         }
