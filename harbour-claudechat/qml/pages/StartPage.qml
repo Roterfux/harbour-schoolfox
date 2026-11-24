@@ -18,6 +18,8 @@ Page {
         }
     }
 
+    Rectangle { anchors.fill: parent; color: "white"; visible: page.errorText !== "" }
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: col.height
@@ -25,13 +27,21 @@ Page {
         Column {
             id: col
             width: parent.width
-            PageHeader { title: qsTr("Claude Chat") }
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                height: implicitHeight + 2 * Theme.paddingLarge
+                verticalAlignment: Text.AlignVCenter
+                text: qsTr("Claude Chat failed to start")
+                font.pixelSize: Theme.fontSizeLarge
+                color: "#111111"
+            }
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.highlightColor
+                color: "#111111"
                 text: page.errorText
             }
             Button {
