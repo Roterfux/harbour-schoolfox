@@ -3,13 +3,16 @@ import Sailfish.Silica 1.0
 import Sailfish.WebView 1.0
 import Sailfish.WebView.Popups 1.0
 
-// claude.ai in a WebView. Web login (email code) works as usual; if it does
-// not (e.g. Google login blocked), paste the sessionKey cookie via the menu.
-Page {
-    id: page
-    allowedOrientations: Orientation.All
-
+// claude.ai in a WebView. Plain Item (not a Page): it is created inside
+// StartPage. WebView is no Flickable, so no PullDownMenu: a small menu
+// button opens MenuPage instead.
+Item {
+    id: root
     property string status: qsTr("Starting WebView")
+
+    function load(url) { web.url = url }
+    function reload() { web.reload() }
+    function currentUrl() { return web.url.toString() }
 
     function applyCookie(value) {
         var js = "document.cookie = 'sessionKey=' + " + JSON.stringify(value)
@@ -20,53 +23,44 @@ Page {
     WebView {
         id: web
         anchors.fill: parent
-        // Set after the page exists: the engine may not be ready at creation.
+        popupProvider: PopupProvider {}
+
+        // Set after creation: the engine may not be ready earlier.
         Component.onCompleted: web.url = "https://claude.ai"
 
         onTitleChanged: app.pageTitle = title
-        onLoadingChanged: page.status = (loading ? qsTr("Loading") : qsTr("Loaded")) + " " + loadProgress + "%"
-        onViewInitialized: page.status = qsTr("Engine ready")
-
-        popupProvider: PopupProvider {}
-
-        PullDownMenu {
-            MenuItem {
-                text: qsTr("Set session cookie")
-                onClicked: {
-                    var d = pageStack.animatorPush(Qt.resolvedUrl("CookieDialog.qml"))
-                    d.pageCompleted.connect(function() {
-                        d.page.accepted.connect(function() { page.applyCookie(d.page.value) })
-                    })
-                }
-            }
-            MenuItem { text: qsTr("New chat"); onClicked: web.url = "https://claude.ai/new" }
-            MenuItem { text: qsTr("Reload"); onClicked: web.reload() }
-            MenuItem { text: qsTr("Open in browser"); onClicked: Qt.openUrlExternally(web.url) }
-        }
-    }
-
-    // Visible until the page shows something; helps when the view stays white.
-    Column {
-        visible: web.loading || web.title === ""
-        anchors { bottom: parent.bottom; left: parent.left; right: parent.right; margins: Theme.horizontalPageMargin }
-        spacing: Theme.paddingMedium
-        Label {
-            width: parent.width
-            wrapMode: Text.Wrap
-            color: "#444444"
-            font.pixelSize: Theme.fontSizeExtraSmall
-            text: page.status + "\n" + web.url
-        }
-        Button {
-            anchors.horizontalCenter: parent.horizontalCenter
-            text: qsTr("Open in browser")
-            onClicked: Qt.openUrlExternally("https://claude.ai")
-        }
+        onLoadingChanged: root.status = (loading ? qsTr("Loading") : qsTr("Loaded")) + " " + loadProgress + "%"
     }
 
     BusyIndicator {
         anchors.centerIn: parent
         size: BusyIndicatorSize.Large
         running: web.loading
+    }
+
+    // Status while nothing is shown yet (dark text: page background is white).
+    Label {
+        visible: web.loading || web.title === ""
+        anchors { bottom: parent.bottom; left: parent.left; right: menuButton.left; margins: Theme.horizontalPageMargin }
+        wrapMode: Text.Wrap
+        color: "#444444"
+        font.pixelSize: Theme.fontSizeExtraSmall
+        text: root.status + "\n" + web.url
+    }
+
+    // Menu button (bottom right, small, semi-transparent)
+    Rectangle {
+        id: menuButton
+        anchors { right: parent.right; bottom: parent.bottom; margins: Theme.paddingLarge }
+        width: Theme.itemSizeSmall
+        height: width
+        radius: width / 2
+        color: "#cc333333"
+        IconButton {
+            anchors.centerIn: parent
+            icon.source: "image://theme/icon-m-menu"
+            icon.color: "white"
+            onClicked: pageStack.animatorPush(Qt.resolvedUrl("MenuPage.qml"), { web: root })
+        }
     }
 }
